@@ -1,0 +1,46 @@
+#:kivy 1.9.1
+#:import os os
+
+<StartScreen>:
+    Image:
+        allow_stretch: True
+        keep_ratio: True
+        size_hint_x: None
+        size_hint_y: None
+        width: self.parent.width
+        height: self.parent.width/self.image_ratio
+        source: app.background
+
+    ImgButton:
+        source: app.assetpath + app.cibles[1]
+        pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+        on_press: root.manager.current = 'game'
+
+    ImgButton:
+        source: os.getcwd() + "/assets/yellow_button00.png"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+        on_press: app.leave()
+        size_hint: None, None
+    Label:
+        text: "Exit"
+        pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+
+<ShootScreen>:
+    Image:
+        source: app.background
+        width: self.parent.width
+        height: self.parent.width/self.image_ratio
+        allow_stretch: True
+        keep_ratio: True
+        size_hint_y: None
+        size_hint_x: None
+    Image:
+        source: app.background2
+        width: self.parent.width
+        height: self.parent.width/self.image_ratio
+        allow_stretch: True
+        keep_ratio: True
+        size_hint_y: None
+        size_hint_x: None
+        # pos_hint: {'x': 0, 'y': 0}
+
