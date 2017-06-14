@@ -27,7 +27,7 @@ import os
 import random
 # from datetime import datetime
 # from kivy.utils import platform
-# from kivy.properties import StringProperty
+from kivy.properties import NumericProperty
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
@@ -83,6 +83,10 @@ class PauseScreen(Screen):
     pass
 
 
+class WinScreen(Screen):
+    pass
+
+
 class LevelScreen(Screen):
     pass
 
@@ -100,9 +104,11 @@ class ShootGame(App):
     background1 = assetpath + ("Background_Blue.png")
     background2 = assetpath + ("Water.png")
     layout = FloatLayout(size_hint=(1, 1))
-    points = 0
+    points = NumericProperty(0)
     dificulty = 'none'  # easy, medium and hard
+    mode = 'none'  # arcade, time
     shoot = SoundLoader.load(os.getcwd() + '/sound/shoot/shotgun.wav')
+    timer = NumericProperty(0)
     # pause = True
 
     def addButtons(self, num):
@@ -119,24 +125,29 @@ class ShootGame(App):
 
     def resetButtons(self):
         for btn in self.shootscreen.children:
-            if 'Duck' in btn.source:
-                self.resetbutton(btn)
+            try:
+                if 'Duck' in btn.source:
+                    self.resetbutton(btn)
+            except AttributeError:
+                pass
 
     def moveButtons(self, dt):
         if self.screen_m.current != 'game':
             pass
-
         else:
             for btn in self.shootscreen.children:
-                if 'Duck' in btn.source:
-                    if 'Yellow' in btn.source:
-                        btn.pos[0] -= 1 * self.difficultymult()
-                    elif 'Brown' in btn.source:
-                        btn.pos[0] -= 1.3 * self.difficultymult()
-                    else:
-                        btn.pos[0] -= 1 * self.difficultymult()  # easy
-                if btn.pos[0] < -80:
-                    self.resetbutton(btn)
+                try:
+                    if 'Duck' in btn.source:
+                        if 'Yellow' in btn.source:
+                            btn.pos[0] -= 1 * self.difficultymult()
+                        elif 'Brown' in btn.source:
+                            btn.pos[0] -= 1.3 * self.difficultymult()
+                        else:
+                            btn.pos[0] -= 1 * self.difficultymult()  # easy
+                    if btn.pos[0] < -80:
+                        self.resetbutton(btn)
+                except AttributeError:
+                    pass
 
     def resetbutton(self, btn):
         btn.touched = False
@@ -169,9 +180,12 @@ class ShootGame(App):
         self.screen_m.add_widget(StartScreen(name='menu'))
         self.screen_m.add_widget(LevelScreen(name='level'))
         self.screen_m.add_widget(PauseScreen(name='pause'))
+        self.screen_m.add_widget(WinScreen(name='win'))
         self.screen_m.add_widget(self.shootscreen)
 
         self.screen_m.current = 'menu'
+        Clock.schedule_interval(self.endtimemode, 1)
+        Clock.schedule_interval(self.moveButtons, 0.01)
 
         return self.screen_m
 
@@ -191,10 +205,27 @@ class ShootGame(App):
         self.dificulty = 'hard'
         self.start()
 
+    def arcademode(self):
+        self.shootscreen.ids.timerlabel.text = ''
+        self.mode = 'arcade'
+
+    def timemode(self):
+        self.shootscreen.ids.timerlabel.text = 'Time ' + str(self.timer)
+        self.timer = 20
+        self.mode = 'time'
+
+    def endtimemode(self, dt):
+        if self.screen_m.current != 'game' or self.mode != 'time':
+            pass
+        else:
+            print(self.timer)
+            if self.timer > 0:
+                self.timer -= 1
+            else:
+                self.screen_m.current = 'win'
+
     def start(self):
-        Clock.schedule_interval(self.moveButtons, 0.01)
         self.addButtons(5)
-        print(self.dificulty)
         self.points = 0
         self.resetButtons()
         self.screen_m.transition = SlideTransition()
