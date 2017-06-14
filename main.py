@@ -37,8 +37,10 @@ from kivy.uix.image import Image
 from kivy.core.window import Window
 # from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
-# from kivy.core.audio import SoundLoader
+from kivy.core.audio import SoundLoader
 # from kivy.graphics import Rectangle
+from kivy.uix.screenmanager import FadeTransition
+from kivy.uix.screenmanager import SlideTransition
 
 Window.size = (800, 480)
 
@@ -52,14 +54,14 @@ class TargetButton(ButtonBehavior, Image):
     killed = False
 
     def on_press(self):
-        print(ShootGame.points)
+        shootgame.shoot.play()
         if self.touched is True:
             if 'Yellow' in self.source:
                 self.source = ShootGame.assetpath + "DuckYellow_1-ok.png"
             elif 'Brown' in self.source:
                 self.source = ShootGame.assetpath + "DuckBrown_6-ok.png"
             if self.killed is not True:
-                ShootGame.points += 3
+                shootgame.points += 3
             self.killed = True
 
         else:
@@ -67,12 +69,21 @@ class TargetButton(ButtonBehavior, Image):
                 self.source = ShootGame.assetpath + "DuckYellow_2.png"
             elif 'Brown' in self.source:
                 self.source = ShootGame.assetpath + "DuckBrown_4.png"
-            ShootGame.points += 10
+            shootgame.points += 10
 
             self.touched = True
+        print(shootgame.points)
 
 
 class ShootScreen(Screen):
+    pass
+
+
+class PauseScreen(Screen):
+    pass
+
+
+class LevelScreen(Screen):
     pass
 
 
@@ -90,60 +101,108 @@ class ShootGame(App):
     background2 = assetpath + ("Water.png")
     layout = FloatLayout(size_hint=(1, 1))
     points = 0
+    dificulty = 'none'  # easy, medium and hard
+    shoot = SoundLoader.load(os.getcwd() + '/sound/shoot/shotgun.wav')
     # pause = True
 
-    # startscreen = StartScreen(name='menu')
-    shootscreen = ShootScreen(name='game')
+    def addButtons(self, num):
+        for x in range(num):
+            self.addButton()
 
-    def addButtons(self):
+    def addButton(self):
         for x in range(2):
 
             btn = TargetButton(
                                size_hint=(None, None),
-                               source=self.assetpath + self.cibles[x],
-                               pos=(
-                                   random.uniform(
-                                    Window.size[0], Window.size[0] + 300),
-                                   random.uniform(
-                                    59, Window.size[1]-89)))
-            self.layout.add_widget(btn)
-            print(btn.pos)
+                               source=self.assetpath + self.cibles[x])
+            self.shootscreen.add_widget(btn)
+
+    def resetButtons(self):
+        for btn in self.shootscreen.children:
+            if 'Duck' in btn.source:
+                btn.touched = False
+                btn.killed = False
+                btn.pos = (
+                        random.uniform(
+                         Window.size[0], Window.size[0] + 300),
+                        random.uniform(
+                         59, Window.size[1]-89))
+                if 'Yellow' in btn.source:
+                    btn.source = self.assetpath + self.cibles[1]
+                elif 'Brown' in btn.source:
+                    btn.source = self.assetpath + self.cibles[0]
 
     def moveButtons(self, dt):
         if self.screen_m.current != 'game':
             pass
 
         else:
-            for btn in self.layout.children:
-                # print(btn.pos)
-                btn.pos[0] -= random.uniform(.1, 4)
+            for btn in self.shootscreen.children:
+                if 'Duck' in btn.source:
+                    if 'Yellow' in btn.source:
+                        btn.pos[0] -= 1 * self.difficultymult()
+                    elif 'Brown' in btn.source:
+                        btn.pos[0] -= 1.3 * self.difficultymult()
+                    else:
+                        btn.pos[0] -= 1 * self.difficultymult()  # easy
+
+    def difficultymult(self):
+        if self.dificulty == 'easy':
+            return random.uniform(.8, 1)
+        elif self.dificulty == 'medium':
+            return random.uniform(1, 2)
+        elif self.dificulty == 'hard':
+            return random.uniform(2, 3)
+        else:
+            return random.uniform(.1, 2)  # easy
 
     def build(self):
         self.screen_m = ScreenManager()
+        self.screen_m.transition.direction = 'up'
 
-        self.shootscreen.add_widget(self.layout)
-
+        self.shootscreen = ShootScreen(name='game')
         self.screen_m.add_widget(StartScreen(name='menu'))
+        self.screen_m.add_widget(LevelScreen(name='level'))
+        self.screen_m.add_widget(PauseScreen(name='pause'))
         self.screen_m.add_widget(self.shootscreen)
 
         self.screen_m.current = 'menu'
 
         Clock.schedule_interval(self.moveButtons, 0.01)
-        self.addButtons()
+        self.addButtons(10)
         return self.screen_m
 
     def on_start(self):
         from kivy.base import EventLoop
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
 
+    def starteasy(self):
+        self.dificulty = 'easy'
+        self.start()
+
+    def startmedium(self):
+        self.dificulty = 'medium'
+        self.start()
+
+    def starthard(self):
+        self.dificulty = 'hard'
+        self.start()
+
+    def start(self):
+        print(self.dificulty)
+        self.points = 0
+        self.resetButtons()
+        self.screen_m.transition = SlideTransition()
+
     def hook_keyboard(self, window, key, *largs):
         if key == 27 or key == 97 or key == 1001:
             if self.screen_m.current == 'game':
-                self.screen_m.current = 'menu'
+                self.screen_m.transition = FadeTransition()
+                self.screen_m.current = 'pause'
             elif self.screen_m.current == 'menu':
                 self.leave()
             else:
-                self.leave()
+                self.screen_m.current = 'menu'
             return True
 
     def leave(self):
