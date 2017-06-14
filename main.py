@@ -120,17 +120,7 @@ class ShootGame(App):
     def resetButtons(self):
         for btn in self.shootscreen.children:
             if 'Duck' in btn.source:
-                btn.touched = False
-                btn.killed = False
-                btn.pos = (
-                        random.uniform(
-                         Window.size[0], Window.size[0] + 300),
-                        random.uniform(
-                         59, Window.size[1]-89))
-                if 'Yellow' in btn.source:
-                    btn.source = self.assetpath + self.cibles[1]
-                elif 'Brown' in btn.source:
-                    btn.source = self.assetpath + self.cibles[0]
+                self.resetbutton(btn)
 
     def moveButtons(self, dt):
         if self.screen_m.current != 'game':
@@ -145,6 +135,21 @@ class ShootGame(App):
                         btn.pos[0] -= 1.3 * self.difficultymult()
                     else:
                         btn.pos[0] -= 1 * self.difficultymult()  # easy
+                if btn.pos[0] < -80:
+                    self.resetbutton(btn)
+
+    def resetbutton(self, btn):
+        btn.touched = False
+        btn.killed = False
+        btn.pos = (
+                random.uniform(
+                 Window.size[0], Window.size[0] + 600),
+                random.uniform(
+                 59, Window.size[1]-89))
+        if 'Yellow' in btn.source:
+            btn.source = self.assetpath + self.cibles[1]
+        elif 'Brown' in btn.source:
+            btn.source = self.assetpath + self.cibles[0]
 
     def difficultymult(self):
         if self.dificulty == 'easy':
@@ -168,8 +173,6 @@ class ShootGame(App):
 
         self.screen_m.current = 'menu'
 
-        Clock.schedule_interval(self.moveButtons, 0.01)
-        self.addButtons(10)
         return self.screen_m
 
     def on_start(self):
@@ -189,6 +192,8 @@ class ShootGame(App):
         self.start()
 
     def start(self):
+        Clock.schedule_interval(self.moveButtons, 0.01)
+        self.addButtons(5)
         print(self.dificulty)
         self.points = 0
         self.resetButtons()
