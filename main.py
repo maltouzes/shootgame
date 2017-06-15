@@ -50,36 +50,44 @@ class ImgButton(ButtonBehavior, Image):
     pass
 
 
+class Duck():
+    '''handle all variables, TargetButton use composition for use Duck'''
+    def __init__(self, ducktype, normalpoints, hurtpoints, rapidity,
+                 normalimg, hurtimg, deadimg):
+        '''initialize all variables'''
+        self.normalimg = normalimg
+        self.hurtimg = hurtimg
+        self.deadimg = deadimg
+        self.rapidity = rapidity
+        self.normalpts = normalpoints
+        self.hurtpts = hurtpoints
+        self.ducktype = ducktype
+
+
 class TargetButton(ButtonBehavior, Image):
-    '''cibles for shoot'''
+    '''cibles for shoot, is composed of the Duck class'''
+    def __init__(self, duck, *args, **kwargs):
+        '''initialize the Duck class parameter as duck (composition),
+        then use super() for parent class. see the MRO for details'''
+        self.duck = duck
+        super().__init__(*args, **kwargs)
     touched = False
     killed = False
 
     def on_press(self):
         '''check which duck is touched or not'''
         shootgame.shoot.play()
-        if self.touched is True:
-            if 'Yellow' in self.source:
-                self.source = ShootGame.assetpath + "DuckYellow_1-ok.png"
-            elif 'Brown' in self.source:
-                self.source = ShootGame.assetpath + "DuckBrown_6-ok.png"
-            elif 'Bad' in self.source:
-                self.source = ShootGame.assetpath + "DuckBad_5.png"
-            if self.killed is not True:
-                shootgame.points += 5
+        if self.touched is True and self.killed is not True:
+            self.source = ShootGame.assetpath + self.duck.deadimg
+            shootgame.points += self.duck.hurtpts
+
             self.killed = True
 
-        else:
-            if 'Yellow' in self.source:
-                self.source = ShootGame.assetpath + "DuckYellow_2.png"
-            elif 'Brown' in self.source:
-                self.source = ShootGame.assetpath + "DuckBrown_4.png"
-            elif 'Bad' in self.source:
-                self.source = ShootGame.assetpath + "DuckBad_4.png"
-            shootgame.points += 3
+        elif self.touched is False:
+            self.source = ShootGame.assetpath + self.duck.hurtimg
+            shootgame.points += self.duck.normalpts
 
             self.touched = True
-        print(shootgame.points)
 
 
 class ShootScreen(Screen):
@@ -129,13 +137,39 @@ class ShootGame(App):
     shoot = SoundLoader.load(os.getcwd() + '/sound/shoot/shotgun.wav')
     timer = NumericProperty(0)
 
-    def addButton(self, ducktype,  num):
+    def ducksinit(self):
+        '''Initialize the cibles, with their
+        :param type: easy, medium, bad or gold
+        :type: normalpts: int
+        :type: hurtpts: int
+        :param rapidity: movement of the duck = rapidity * dificulty
+        :param normalimg: img of the duck
+        :param hurtmalimg: img of the duck is hurted
+        :param deadimg: img when the duck is dead
+        '''
+        self.dkeasy = Duck('easy', 30, 50, 1,  # pts, pts and rapidity
+                           'DuckBrown_2.png',
+                           'DuckBrown_4.png',
+                           'DuckBrown_6-ok.png')
+
+        self.dkmedium = Duck('medium', 40, 100, 1.3,  # pts, pts and rapidity
+                             'DuckYellow_3.png',
+                             'DuckYellow_2.png',
+                             'DuckYellow_1-ok.png')
+
+        self.dkbad = Duck('easy', 10, 300, 2,  # pts, pts and rapidity
+                          'DuckBad_3.png',
+                          'DuckBad_4.png',
+                          'DuckBad_5.png')
+
+    def addCibles(self, duck, num):
         '''add the cibles take a ducktype parameter (easy, medium, bad, gold)
         and add the coresponding duck multiplying the num parameter (number)'''
         for x in range(num):
             btn = TargetButton(
+                    duck,
                     size_hint=(None, None),
-                    source=self.assetpath + self.cibles[ducktype])
+                    source=self.assetpath + duck.normalimg)
 
             self.shootscreen.add_widget(btn)
 
@@ -151,19 +185,15 @@ class ShootGame(App):
 
     def moveButtons(self, dt):
         '''move every buttons (cibles) in the screen according to the dificulty
-        and the image source (yellow or brown)'''
+        and the rapidity of the cibles'''
         if self.screen_m.current != 'game':
             pass
         else:
             for btn in self.shootscreen.children:
                 try:
                     if 'Duck' in btn.source:
-                        if 'Yellow' in btn.source:
-                            btn.pos[0] -= 1 * self.difficultymult()
-                        elif 'Brown' in btn.source:
-                            btn.pos[0] -= 1.3 * self.difficultymult()
-                        else:
-                            btn.pos[0] -= 1 * self.difficultymult()  # easy
+                        btn.pos[0] -= btn.duck.rapidity * self.difficultymult()
+
                     if btn.pos[0] < -80:
                         self.resetbutton(btn)
                 except AttributeError:
@@ -178,10 +208,7 @@ class ShootGame(App):
                  Window.size[0], Window.size[0] + 600),
                 random.uniform(
                  59, Window.size[1]-89))
-        if 'Yellow' in btn.source:
-            btn.source = self.assetpath + self.cibles['medium']
-        elif 'Brown' in btn.source:
-            btn.source = self.assetpath + self.cibles['easy']
+        btn.source = self.assetpath + btn.duck.normalimg
 
     def difficultymult(self):
         '''return the dificulty multiplier for move the buttons'''
@@ -205,6 +232,12 @@ class ShootGame(App):
         self.screen_m.add_widget(PauseScreen(name='pause'))
         self.screen_m.add_widget(WinScreen(name='win'))
         self.screen_m.add_widget(self.shootscreen)
+
+        self.ducksinit()
+
+        self.addCibles(self.dkeasy, 5)
+        self.addCibles(self.dkmedium, 3)
+        self.addCibles(self.dkbad, 2)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtimemode, 1)
@@ -259,9 +292,6 @@ class ShootGame(App):
     def start(self):
         '''add the button to the screen and reset their position. reset the
         points'''
-        self.addButton('easy', 5)
-        self.addButton('medium', 5)
-        self.addButton('bad', 2)
         self.points = 0
         self.resetButtons()
         self.screen_m.transition = SlideTransition()
