@@ -91,6 +91,9 @@ class TargetButton(ButtonBehavior, Image):
 
             self.touched = True
 
+        if shootgame.points < 0:
+            shootgame.points = 0
+
 
 class ShootScreen(Screen):
     '''ingame screen'''
@@ -124,13 +127,13 @@ class StartScreen(Screen):
 
 class ShootGame(App):
     '''all the logic of the game'''
-    assetpath = os.getcwd() + ("/assets/PNG/")
+    assetpath = os.getcwd() + ("/assets/")
     cibles = {'easy': 'DuckBrown_2.png', 'medium': 'DuckYellow_3.png',
               'bad': 'DuckBad_3.png', 'gold': 'none'}
 
-    background = assetpath + ("Background_Orange.png")
-    background1 = assetpath + ("Background_Blue.png")
-    background2 = assetpath + ("Water.png")
+    background = assetpath + ("PNG/Background_Orange.png")
+    background1 = assetpath + ("PNG/Background_Blue.png")
+    background2 = assetpath + ("PNG/Water.png")
     layout = FloatLayout(size_hint=(1, 1))
     points = NumericProperty(0)
     bestscore = 0
@@ -150,24 +153,24 @@ class ShootGame(App):
         :param deadimg: img when the duck is dead
         '''
         self.dkeasy = Duck('easy', 30, 50, 1,  # pts, pts and rapidity
-                           'DuckBrown_2.png',
-                           'DuckBrown_4.png',
-                           'DuckBrown_6-ok.png')
+                           'birds/BirdGreen.gif',
+                           'birds/BirdGreen-hit.gif',
+                           'birds/BirdGreen-hit.gif')
 
         self.dkmedium = Duck('medium', 40, 100, 1.3,  # pts, pts and rapidity
-                             'DuckYellow_3.png',
-                             'DuckYellow_2.png',
-                             'DuckYellow_1-ok.png')
+                             'birds/BirdYellow.gif',
+                             'birds/BirdYellow-hit.gif',
+                             'birds/BirdYellow-hit.gif')
 
         self.dkhard = Duck('hard', 10, 300, 2,  # pts, pts and rapidity
-                           'DuckBad_3.png',
-                           'DuckBad_4.png',
-                           'DuckBad_5.png')
+                           'birds/BirdPurple.gif',
+                           'birds/BirdPurple-hit.gif',
+                           'birds/BirdPurple-hit.gif')
 
         self.dkbad = Duck('bad', -90, -300, 2,  # pts, pts and rapidity
-                          'bomb_6.png',
-                          'bomb_6.png',
-                          'bomb_6.png')
+                          'PNG/bomb_6.png',
+                          'PNG/bomb_6.png',
+                          'PNG/bomb_6.png')
 
     def addCibles(self, duck, num):
         '''add the cibles take a duck parameter
@@ -185,7 +188,7 @@ class ShootGame(App):
         source image'''
         for btn in self.shootscreen.children:
             try:
-                if 'Duck' in btn.source or 'bomb' in btn.source:
+                if 'Bird' in btn.source or 'bomb' in btn.source:
                     self.resetbutton(btn)
             except AttributeError:
                 pass
@@ -198,13 +201,21 @@ class ShootGame(App):
         else:
             for btn in self.shootscreen.children:
                 try:
-                    if 'Duck' in btn.source or 'bomb' in btn.source:
-                        btn.pos[0] -= btn.duck.rapidity * self.difficultymult()
+                    if 'Bird' in btn.source or 'bomb' in btn.source:
+                        if btn.killed:
+                            btn.pos[1] -= 6
+                            btn.pos[0] -= 4
+                        else:
+                            btn.pos[0] -= (btn.duck.rapidity *
+                                           self.difficultymult())
 
-                    if btn.pos[0] < -80:
+                    if btn.pos[0] < -490:
                         self.resetbutton(btn)
                 except AttributeError:
                     pass
+
+    def moveButtonDead(self):
+        pass
 
     def resetbutton(self, btn):
         '''reset the position,the source image and the status of the button'''
@@ -244,7 +255,7 @@ class ShootGame(App):
 
         self.addCibles(self.dkeasy, 5)
         self.addCibles(self.dkmedium, 3)
-        self.addCibles(self.dkhard, 2)
+        self.addCibles(self.dkhard, 1)
         self.addCibles(self.dkbad, 3)
 
         self.screen_m.current = 'menu'
