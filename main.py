@@ -225,7 +225,7 @@ class ShootGame(App):
                 random.uniform(
                  Window.size[0], Window.size[0] + 600),
                 random.uniform(
-                 59, Window.size[1]-89))
+                 0, Window.size[1]-btn.texture.size[1]))
         btn.source = self.assetpath + btn.duck.normalimg
 
     def difficultymult(self):
