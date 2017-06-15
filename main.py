@@ -71,8 +71,10 @@ class TargetButton(ButtonBehavior, Image):
         then use super() for parent class. see the MRO for details'''
         self.duck = duck
         super().__init__(*args, **kwargs)
-    touched = False
-    killed = False
+    '''the above parameters must be a part of TargetButton and not a part of
+    Duck, because all TargetButton share the same Duck instance'''
+    touched = False  # keep this here
+    killed = False   # heep this here
 
     def on_press(self):
         '''check which duck is touched or not'''
@@ -139,7 +141,7 @@ class ShootGame(App):
 
     def ducksinit(self):
         '''Initialize the cibles, with their
-        :param type: easy, medium, bad or gold
+        :param type: easy, medium, hard or bad
         :type: normalpts: int
         :type: hurtpts: int
         :param rapidity: movement of the duck = rapidity * dificulty
@@ -157,13 +159,18 @@ class ShootGame(App):
                              'DuckYellow_2.png',
                              'DuckYellow_1-ok.png')
 
-        self.dkbad = Duck('easy', 10, 300, 2,  # pts, pts and rapidity
-                          'DuckBad_3.png',
-                          'DuckBad_4.png',
-                          'DuckBad_5.png')
+        self.dkhard = Duck('hard', 10, 300, 2,  # pts, pts and rapidity
+                           'DuckBad_3.png',
+                           'DuckBad_4.png',
+                           'DuckBad_5.png')
+
+        self.dkbad = Duck('bad', -90, -300, 2,  # pts, pts and rapidity
+                          'bomb_6.png',
+                          'bomb_6.png',
+                          'bomb_6.png')
 
     def addCibles(self, duck, num):
-        '''add the cibles take a ducktype parameter (easy, medium, bad, gold)
+        '''add the cibles take a duck parameter
         and add the coresponding duck multiplying the num parameter (number)'''
         for x in range(num):
             btn = TargetButton(
@@ -178,7 +185,7 @@ class ShootGame(App):
         source image'''
         for btn in self.shootscreen.children:
             try:
-                if 'Duck' in btn.source:
+                if 'Duck' in btn.source or 'bomb' in btn.source:
                     self.resetbutton(btn)
             except AttributeError:
                 pass
@@ -191,7 +198,7 @@ class ShootGame(App):
         else:
             for btn in self.shootscreen.children:
                 try:
-                    if 'Duck' in btn.source:
+                    if 'Duck' in btn.source or 'bomb' in btn.source:
                         btn.pos[0] -= btn.duck.rapidity * self.difficultymult()
 
                     if btn.pos[0] < -80:
@@ -224,7 +231,7 @@ class ShootGame(App):
     def build(self):
         '''create a ScreenManager and add all the Screens'''
         self.screen_m = ScreenManager()
-        self.screen_m.transition.direction = 'up'
+        self.screen_m.transition.direction = 'left'
 
         self.shootscreen = ShootScreen(name='game')
         self.screen_m.add_widget(StartScreen(name='menu'))
@@ -237,7 +244,8 @@ class ShootGame(App):
 
         self.addCibles(self.dkeasy, 5)
         self.addCibles(self.dkmedium, 3)
-        self.addCibles(self.dkbad, 2)
+        self.addCibles(self.dkhard, 2)
+        self.addCibles(self.dkbad, 3)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtimemode, 1)
@@ -268,10 +276,14 @@ class ShootGame(App):
     def arcademode(self):
         '''remove the timer from the screen'''
         self.shootscreen.ids.timerlabel.text = ''
+        self.screen_m.transition = SlideTransition()
+        self.screen_m.transition.direction = 'left'
         self.mode = 'arcade'
 
     def timemode(self):
         '''initialize the timer'''
+        self.screen_m.transition = SlideTransition()
+        self.screen_m.transition.direction = 'left'
         self.shootscreen.ids.timerlabel.text = 'Time ' + str(self.timer)
         self.timer = 16
         self.shootscreen.ids.timerlabel.color = (1, 1, 1, 1)
@@ -295,6 +307,7 @@ class ShootGame(App):
         self.points = 0
         self.resetButtons()
         self.screen_m.transition = SlideTransition()
+        self.screen_m.transition.direction = 'up'
 
     def hook_keyboard(self, window, key, *largs):
         '''hook the back key'''
@@ -314,7 +327,12 @@ class ShootGame(App):
 
     def on_pause(self):
         '''Enable pause on Android'''
+        self.savescore()
         return True
+
+    def on_stop(self):
+        '''save score when the app stop'''
+        self.savescore()
 
     def on_resume(self):
         '''Resume after on_pause on Android'''
@@ -322,15 +340,15 @@ class ShootGame(App):
 
     def savescore(self):
         '''save the score to a file'''
-        with open('scores') as f:
-            f.write(self.bestscore)
+        with open('scores', 'w') as f:
+            f.write(str(self.bestscore))
 
     def loadscore(self):
         '''load a score from a file'''
         if os.path.isfile('score'):
-            print('y')
-            with open('scores') as f:
-                f.read()
+            with open('scores', 'r') as f:
+                self.bestscore = f
+                pass
 
 
 if __name__ == '__main__':

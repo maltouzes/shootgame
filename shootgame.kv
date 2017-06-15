@@ -15,8 +15,8 @@
         source: os.getcwd() + "/assets/UIpack/PNG/yellow_button00.png"
         pos_hint: {'center_x': 0.5, 'center_y': 0.8}
         size_hint: 1.2, None
-        on_press: app.arcademode()
         on_press: root.manager.current = 'level'
+        on_press: app.arcademode()
     Label:
         text: "Arcade"
         pos_hint: {'center_x': 0.5, 'center_y': 0.8}
@@ -24,8 +24,8 @@
     ImgButton:
         source: os.getcwd() + "/assets/UIpack/PNG/green_button00.png"
         pos_hint: {'center_x': 0.5, 'center_y': 0.6}
-        on_press: app.timemode()
         on_press: root.manager.current = 'level'
+        on_press: app.timemode()
         size_hint: 1.2, None
     Label:
         text: "Time"
