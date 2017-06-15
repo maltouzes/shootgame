@@ -41,6 +41,7 @@ from kivy.core.audio import SoundLoader
 # from kivy.graphics import Rectangle
 from kivy.uix.screenmanager import FadeTransition
 from kivy.uix.screenmanager import SlideTransition
+from kivy.animation import Animation
 
 Window.size = (800, 480)
 
@@ -75,6 +76,7 @@ class TargetButton(ButtonBehavior, Image):
     Duck, because all TargetButton share the same Duck instance'''
     touched = False  # keep this here
     killed = False   # heep this here
+    falling = False
 
     def on_press(self):
         '''check which duck is touched or not'''
@@ -93,6 +95,24 @@ class TargetButton(ButtonBehavior, Image):
 
         if shootgame.points < 0:
             shootgame.points = 0
+        # self.deadanim()
+
+    def deadanim(self):
+        animation = Animation(pos=(
+            self.pos[0] - self.size[0]/2, self.pos[1] + self.size[1]/2),
+            t='linear',
+            duration=.3)
+
+        animation += Animation(pos=(
+            self.pos[0] - self.size[0]/1.8, self.pos[1] + self.size[1]/1.8),
+            t='linear',
+            duration=.1)
+
+        animation += Animation(pos=(
+            self.pos[0] - self.size[0], - self.size[1]),
+            t='in_quad')
+
+        animation.start(self)
 
 
 class ShootScreen(Screen):
@@ -202,9 +222,9 @@ class ShootGame(App):
             for btn in self.shootscreen.children:
                 try:
                     if 'Bird' in btn.source or 'bomb' in btn.source:
-                        if btn.killed:
-                            btn.pos[1] -= 6
-                            btn.pos[0] -= 4
+                        if btn.killed and not btn.falling:
+                            btn.falling = True
+                            btn.deadanim()
                         else:
                             btn.pos[0] -= (btn.duck.rapidity *
                                            self.difficultymult())
@@ -221,6 +241,7 @@ class ShootGame(App):
         '''reset the position,the source image and the status of the button'''
         btn.touched = False
         btn.killed = False
+        btn.falling = False
         btn.pos = (
                 random.uniform(
                  Window.size[0], Window.size[0] + 600),
