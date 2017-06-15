@@ -2,14 +2,19 @@
 #:import os os
 
 <StartScreen>:
-    Image:
-        allow_stretch: True
-        keep_ratio: True
-        size_hint_x: None
-        size_hint_y: None
-        width: self.parent.width
-        height: self.parent.width/self.image_ratio
-        source: app.background1
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: app.background1
+    #Image:
+     #   allow_stretch: True
+      #  keep_ratio: True
+       # size_hint_x: None
+        #size_hint_y: None
+        #width: self.parent.width
+        #height: self.parent.width/self.image_ratio
+        #source: app.background1
 
     ImgButton:
         source: os.getcwd() + "/assets/UIpack/PNG/yellow_button00.png"
@@ -41,14 +46,11 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
 
 <LevelScreen>:
-    Image:
-        allow_stretch: True
-        keep_ratio: True
-        size_hint_x: None
-        size_hint_y: None
-        width: self.parent.width
-        height: self.parent.width/self.image_ratio
-        source: app.background1
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: app.background1
 
     ImgButton:
         source: os.getcwd() + "/assets/UIpack/PNG/green_button00.png"
@@ -82,14 +84,11 @@
 
 
 <PauseScreen>:
-    Image:
-        allow_stretch: True
-        keep_ratio: True
-        size_hint_x: None
-        size_hint_y: None
-        width: self.parent.width
-        height: self.parent.width/self.image_ratio
-        source: app.background1
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: app.background1
 
     ImgButton:
         source: app.assetpath + 'birds/BirdGreen.gif'
@@ -110,23 +109,11 @@
 
 
 <ShootScreen>:
-    Image:
-        source: app.background
-        width: self.parent.width
-        height: self.parent.width/self.image_ratio
-        allow_stretch: True
-        keep_ratio: True
-        size_hint_y: None
-        size_hint_x: None
-    Image:
-        source: app.background2
-        width: self.parent.width
-        height: self.parent.width/self.image_ratio
-        allow_stretch: True
-        keep_ratio: True
-        size_hint_y: None
-        size_hint_x: None
-        # pos_hint: {'x': 0, 'y': 0}
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: app.background2
 
     Label:
         text: 'Points ' + str(app.points)
@@ -138,14 +125,11 @@
         pos_hint: {'center_x': 0.9, 'center_y': 0.8}
 
 <WinScreen>:
-    Image:
-        allow_stretch: True
-        keep_ratio: True
-        size_hint_x: None
-        size_hint_y: None
-        width: self.parent.width
-        height: self.parent.width/self.image_ratio
-        source: app.background1
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: app.background3
 
     Label:
         text: "You Win!"

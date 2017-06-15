@@ -151,9 +151,14 @@ class ShootGame(App):
     cibles = {'easy': 'DuckBrown_2.png', 'medium': 'DuckYellow_3.png',
               'bad': 'DuckBad_3.png', 'gold': 'none'}
 
-    background = assetpath + ("PNG/Background_Orange.png")
+    background1 = assetpath + ("background/2.png")
+    background2 = assetpath + ("background/1.png")
+    background3 = assetpath + ("background/4.png")
+
+    '''background = assetpath + ("PNG/Background_Orange.png")
     background1 = assetpath + ("PNG/Background_Blue.png")
-    background2 = assetpath + ("PNG/Water.png")
+    background2 = assetpath + ("PNG/Water.png")'''
+
     layout = FloatLayout(size_hint=(1, 1))
     points = NumericProperty(0)
     bestscore = 0
