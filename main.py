@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.1'
+__version__ = '0.0.13'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -25,12 +25,14 @@ ShootGame is a game
 
 import os
 import random
+from customtransition import CustomTransition
 # from datetime import datetime
 # from kivy.utils import platform
 from kivy.properties import NumericProperty
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
+from kivy.uix.screenmanager import AnimationTransition
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.image import Image
@@ -42,13 +44,19 @@ from kivy.core.audio import SoundLoader
 from kivy.uix.screenmanager import FadeTransition
 from kivy.uix.screenmanager import SlideTransition
 from kivy.animation import Animation
+from kivy.lang import Builder
 
-Window.size = (800, 480)
+Window.size = (800, 460)
 
 
 class ImgButton(ButtonBehavior, Image):
     '''custom button use in kv lang for the gui'''
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.size_hint = 1.2, None
+
+    def on_press(self):
+        shootgame.soundbtn.play()
 
 
 class Duck():
@@ -117,6 +125,19 @@ class TargetButton(ButtonBehavior, Image):
 
 class ShootScreen(Screen):
     '''ingame screen'''
+
+    def on_touch_down(self, touch):
+        if super(ShootScreen, self).on_touch_down(touch):
+            return True
+        if not self.collide_point(touch.x, touch.y):
+            return False
+        print('you touched me!')
+        shootgame.shoot.play()
+        shootgame.points -= 1
+        if shootgame.points < 0:
+            shootgame.points = 0
+        return True
+
     pass
 
 
@@ -164,7 +185,8 @@ class ShootGame(App):
     bestscore = 0
     dificulty = 'none'  # easy, medium and hard
     mode = 'none'  # arcade, time
-    shoot = SoundLoader.load(os.getcwd() + '/sound/shoot/shotgun.wav')
+    shoot = SoundLoader.load(os.getcwd() + '/sound/shotgun.wav')
+    soundbtn = SoundLoader.load(os.getcwd() + '/sound/push.ogg')
     timer = NumericProperty(0)
 
     def ducksinit(self):
@@ -192,10 +214,15 @@ class ShootGame(App):
                            'birds/BirdPurple-hit.gif',
                            'birds/BirdPurple-hit.gif')
 
-        self.dkbad = Duck('bad', -90, -300, 2,  # pts, pts and rapidity
+        self.dkbonus = Duck('bonus', 1000, 0, 1,
+                            'birds/BirdGrey1.gif',
+                            'birds/BirdGrey1-hit.gif',
+                            'birds/BirdGrey1-hit.gif')
+
+        self.dkbad = Duck('bad', -300, 0, 2,  # pts, pts and rapidity
                           'PNG/bomb_6.png',
-                          'PNG/bomb_6.png',
-                          'PNG/bomb_6.png')
+                          'PNG/bomb_dead.gif',
+                          'PNG/bomb_dead.gif')
 
     def addCibles(self, duck, num):
         '''add the cibles take a duck parameter
@@ -204,7 +231,11 @@ class ShootGame(App):
             btn = TargetButton(
                     duck,
                     size_hint=(None, None),
-                    source=self.assetpath + duck.normalimg)
+                    source=self.assetpath + duck.hurtimg)
+            btn.source = self.assetpath + duck.normalimg  # load all img
+            btn.source = self.assetpath + duck.deadimg  # load all img
+            if 'bomb' in btn.source:
+                btn.anim_loop = 1
 
             self.shootscreen.add_widget(btn)
 
@@ -227,9 +258,11 @@ class ShootGame(App):
             for btn in self.shootscreen.children:
                 try:
                     if 'Bird' in btn.source or 'bomb' in btn.source:
+                        # if 'bonus' in btn.source
                         if btn.killed and not btn.falling:
                             btn.falling = True
-                            btn.deadanim()
+                            if 'bomb' not in btn.source:
+                                btn.deadanim()
                         else:
                             btn.pos[0] -= (btn.duck.rapidity *
                                            self.difficultymult())
@@ -267,6 +300,12 @@ class ShootGame(App):
 
     def build(self):
         '''create a ScreenManager and add all the Screens'''
+        filename = (os.getcwd() + '/shootgamebuild.kv')
+
+        with open(filename, encoding='utf-8') as f:
+            Builder.load_string(f.read())
+
+        self.soundbtn.volume = 0.5
         self.screen_m = ScreenManager()
         self.screen_m.transition.direction = 'left'
 
@@ -283,6 +322,7 @@ class ShootGame(App):
         self.addCibles(self.dkmedium, 3)
         self.addCibles(self.dkhard, 1)
         self.addCibles(self.dkbad, 3)
+        self.addCibles(self.dkbonus, 1)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtimemode, 1)
@@ -312,8 +352,13 @@ class ShootGame(App):
 
     def arcademode(self):
         '''remove the timer from the screen'''
+        # self.screen_m.transition = SlideTransition()
+
         self.shootscreen.ids.timerlabel.text = ''
-        self.screen_m.transition = SlideTransition()
+
+        self.screen_m.transition = CustomTransition()
+        self.screen_m.transition.al = AnimationTransition.out_quad
+        # self.screen_m.transition.duration = .4
         self.screen_m.transition.direction = 'left'
         self.mode = 'arcade'
 
@@ -322,8 +367,8 @@ class ShootGame(App):
         self.screen_m.transition = SlideTransition()
         self.screen_m.transition.direction = 'left'
         self.shootscreen.ids.timerlabel.text = 'Time ' + str(self.timer)
-        self.timer = 16
-        self.shootscreen.ids.timerlabel.color = (1, 1, 1, 1)
+        self.timer = 21
+        self.shootscreen.ids.timerlabel.color = (0, 0, 0, 1)
         self.mode = 'time'
 
     def endtimemode(self, dt):
@@ -355,6 +400,7 @@ class ShootGame(App):
             elif self.screen_m.current == 'menu':
                 self.leave()
             else:
+                self.screen_m.transition = FadeTransition()
                 self.screen_m.current = 'menu'
             return True
 
@@ -389,5 +435,8 @@ class ShootGame(App):
 
 
 if __name__ == '__main__':
+    # import sys
+    # print('SYS.GETFILESYSTEMENCODING()')
+    # print(sys.getfilesystemencoding())
     shootgame = ShootGame()
     shootgame.run()
