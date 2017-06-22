@@ -25,14 +25,15 @@ ShootGame is a game
 
 import os
 import random
-from customtransition import CustomTransition
+# from customtransition import CustomTransition
+# from kivy.uix.screenmanager import AnimationTransition
 # from datetime import datetime
 # from kivy.utils import platform
+from kivy.uix.label import Label
 from kivy.properties import NumericProperty
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
-from kivy.uix.screenmanager import AnimationTransition
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.image import Image
@@ -53,7 +54,7 @@ class ImgButton(ButtonBehavior, Image):
     '''custom button use in kv lang for the gui'''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.size_hint = 1.2, None
+        self.size_hint = 0.3, 0.3
 
     def on_press(self):
         shootgame.soundbtn.play()
@@ -96,21 +97,48 @@ class TargetButton(ButtonBehavior, Image):
     def on_press(self):
         '''check which duck is touched or not'''
         shootgame.shoot.play()
+        ptsmulti = shootgame.dificultypts
         if self.touched is True and self.killed is not True:
             self.source = ShootGame.assetpath + self.duck.deadimg
-            shootgame.points += self.duck.hurtpts
+            ptswin = self.duck.hurtpts * ptsmulti
+            shootgame.points += ptswin
+            self.displayptswin(ptswin)
+            self.scoretotime()
 
             self.killed = True
 
         elif self.touched is False:
             self.source = ShootGame.assetpath + self.duck.hurtimg
-            shootgame.points += self.duck.normalpts
+            ptswin = self.duck.normalpts * ptsmulti
+            shootgame.points += ptswin
+            self.displayptswin(ptswin)
+            self.scoretotime()
 
             self.touched = True
 
         if shootgame.points < 0:
             shootgame.points = 0
-        # self.deadanim()
+
+    def scoretotime(self):
+        '''transform pts to time'''
+        pointup = shootgame.points - shootgame.lstscorebeforeaddtime
+        pointupdif = pointup/shootgame.dificultypts
+        if (pointupdif >= shootgame.scoretotime):
+            pointbyhundred = (round(pointup/100)*100)
+            scoreremain = pointupdif - pointbyhundred
+            timeadded = \
+                (shootgame.timeadd *
+                 int(round(pointupdif/shootgame.scoretotime)))
+            shootgame.timer += timeadded
+            shootgame.lstscorebeforeaddtime = shootgame.points - scoreremain
+
+    def displayptswin(self, pts):
+        for w in shootgame.shootscreen.children:
+            if isinstance(w, ScoreLabel):
+                x = self.pos[0] / Window.size[0]
+                y = self.pos[1] / Window.size[1]
+                w.pos_hint = {'center_x':  x, 'center_y': y}
+                w.text = str(pts)
 
     def deadanim(self):
         animation = Animation(pos=(
@@ -128,6 +156,10 @@ class TargetButton(ButtonBehavior, Image):
             t='in_quad')
 
         animation.start(self)
+
+
+class ScoreLabel(Label):
+    pass
 
 
 class ShootScreen(Screen):
@@ -190,10 +222,15 @@ class ShootGame(App):
     points = NumericProperty(0)
     bestscore = 0
     dificulty = 'none'  # easy, medium and hard
+    dificultypts = 1
     mode = 'none'  # arcade, time
     shoot = SoundLoader.load(os.getcwd() + '/sound/shotgun.wav')
     soundbtn = SoundLoader.load(os.getcwd() + '/sound/push.ogg')
     timer = NumericProperty(0)
+    scorelabel = ScoreLabel(text='', font_size='25sp')
+    lstscorebeforeaddtime = 0
+    scoretotime = 100  # pts = timeadd
+    timeadd = 10  # sec added
 
     def ducksinit(self):
         '''Initialize the cibles, with their
@@ -241,6 +278,7 @@ class ShootGame(App):
     def addCibles(self, duck, num):
         '''add the cibles take a duck parameter
         and add the coresponding duck multiplying the num parameter (number)'''
+
         for x in range(num):
             btn = TargetButton(
                     duck,
@@ -323,12 +361,16 @@ class ShootGame(App):
     def difficultymult(self):
         '''return the dificulty multiplier for move the buttons'''
         if self.dificulty == 'easy':
+            self.dificultypts = 1
             return random.uniform(.8, 1)
         elif self.dificulty == 'medium':
+            self.dificultypts = 2
             return random.uniform(1, 2)
         elif self.dificulty == 'hard':
+            self.dificultypts = 3
             return random.uniform(2, 3)
         else:
+            self.dificultypts = 1
             return random.uniform(.1, 2)  # easy
 
     def build(self):
@@ -351,6 +393,8 @@ class ShootGame(App):
 
         self.ducksinit()
 
+        # self.shootscreen.add_widget(ScoreLabel(text='', font_size='25sp'))
+        self.shootscreen.add_widget(self.scorelabel)
         self.addCibles(self.dkeasy, 5)
         self.addCibles(self.dkmedium, 3)
         self.addCibles(self.dkhard, 1)
@@ -372,16 +416,19 @@ class ShootGame(App):
     def starteasy(self):
         '''set dificulty'''
         self.dificulty = 'easy'
+        print(self.dificulty)
         self.start()
 
     def startmedium(self):
         '''set dificulty'''
         self.dificulty = 'medium'
+        print(self.dificulty)
         self.start()
 
     def starthard(self):
         '''set dificulty'''
         self.dificulty = 'hard'
+        print(self.dificulty)
         self.start()
 
     def arcademode(self):
@@ -390,8 +437,8 @@ class ShootGame(App):
 
         self.shootscreen.ids.timerlabel.text = ''
 
-        self.screen_m.transition = CustomTransition()
-        self.screen_m.transition.al = AnimationTransition.out_quad
+        # self.screen_m.transition = CustomTransition()
+        # self.screen_m.transition.al = AnimationTransition.out_quad
         # self.screen_m.transition.duration = .4
         self.screen_m.transition.direction = 'left'
         self.mode = 'arcade'
@@ -436,9 +483,6 @@ class ShootGame(App):
             '''implement crasy duck clock'''
             if isinstance(btn, TargetButton) and 'crasy' in btn.duck.ducktype:
                 # bt_crasy = btn
-                print(btn.pos[0])
-                print(btn.duck.timebeforespawn)
-                print(btn.duck.timehere)
                 btn.duck.timebeforespawn -= 1
 
                 if btn.duck.timebeforespawn < 0:
@@ -465,7 +509,9 @@ class ShootGame(App):
     def start(self):
         '''add the button to the screen and reset their position. reset the
         points'''
+        self.lstscorebeforeaddtime = 0
         self.points = 0
+        self.scorelabel.text = ''
         self.resetButtons()
         self.screen_m.transition = SlideTransition()
         self.screen_m.transition.direction = 'up'
