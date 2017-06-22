@@ -62,7 +62,8 @@ class ImgButton(ButtonBehavior, Image):
 class Duck():
     '''handle all variables, TargetButton use composition for use Duck'''
     def __init__(self, ducktype, normalpoints, hurtpoints, rapidity,
-                 normalimg, hurtimg, deadimg):
+                 normalimg, hurtimg, deadimg,
+                 timespawn=[4, 8], timehere=[8, 13]):
         '''initialize all variables'''
         self.normalimg = normalimg
         self.hurtimg = hurtimg
@@ -71,6 +72,12 @@ class Duck():
         self.normalpts = normalpoints
         self.hurtpts = hurtpoints
         self.ducktype = ducktype
+        self.velocity_x = None
+        self.velocity_y = None
+        self.timespawn = timespawn
+        self.timeheredefault = timehere
+        self.timebeforespawn = 1000
+        self.timehere = 0
 
 
 class TargetButton(ButtonBehavior, Image):
@@ -131,7 +138,6 @@ class ShootScreen(Screen):
             return True
         if not self.collide_point(touch.x, touch.y):
             return False
-        print('you touched me!')
         shootgame.shoot.play()
         shootgame.points -= 1
         if shootgame.points < 0:
@@ -214,15 +220,23 @@ class ShootGame(App):
                            'birds/BirdPurple-hit.gif',
                            'birds/BirdPurple-hit.gif')
 
-        self.dkbonus = Duck('bonus', 1000, 0, 1,
+        self.dkbonus = Duck('crasy', 1000, 0, 3,
                             'birds/BirdGrey1.gif',
                             'birds/BirdGrey1-hit.gif',
-                            'birds/BirdGrey1-hit.gif')
+                            'birds/BirdGrey1-hit.gif',
+                            [13, 16],
+                            [3, 5])
 
         self.dkbad = Duck('bad', -300, 0, 2,  # pts, pts and rapidity
                           'PNG/bomb_6.png',
                           'PNG/bomb_dead.gif',
                           'PNG/bomb_dead.gif')
+
+        self.dkcrasy = Duck('crasy', -300, 0, 2,
+                            'birds/BirdSkull2.gif',
+                            'birds/BirdSkull2-hit.gif',
+                            'birds/BirdSkull2-hit.gif',
+                            [13, 16])
 
     def addCibles(self, duck, num):
         '''add the cibles take a duck parameter
@@ -243,11 +257,13 @@ class ShootGame(App):
         '''reset all the buttons to their original position and their original
         source image'''
         for btn in self.shootscreen.children:
-            try:
-                if 'Bird' in btn.source or 'bomb' in btn.source:
-                    self.resetbutton(btn)
-            except AttributeError:
-                pass
+            if isinstance(btn, TargetButton):  # and
+                    # 'crasy' not in btn.duck.ducktype):
+                try:
+                    if 'Bird' in btn.source or 'bomb' in btn.source:
+                        self.resetbutton(btn)
+                except AttributeError:
+                    pass
 
     def moveButtons(self, dt):
         '''move every buttons (cibles) in the screen according to the dificulty
@@ -256,8 +272,11 @@ class ShootGame(App):
             pass
         else:
             for btn in self.shootscreen.children:
+
                 try:
-                    if 'Bird' in btn.source or 'bomb' in btn.source:
+                    if btn.duck.ducktype == 'crasy':
+                        self.movebuttoncrasy(btn)
+                    elif 'Bird' in btn.source or 'bomb' in btn.source:
                         # if 'bonus' in btn.source
                         if btn.killed and not btn.falling:
                             btn.falling = True
@@ -267,25 +286,39 @@ class ShootGame(App):
                             btn.pos[0] -= (btn.duck.rapidity *
                                            self.difficultymult())
 
-                    if btn.pos[0] < -490:
-                        self.resetbutton(btn)
+                        if ((btn.pos[0] < -490 or
+                            btn.pos[1] < 0 - btn.texture.size[1] or
+                                btn.pos[1] > (Window.size[1] +
+                                              btn.texture.size[1])) and 'crasy'
+                                not in btn.duck.ducktype):
+                                self.resetbutton(btn)
                 except AttributeError:
                     pass
 
+    def movebuttoncrasy(self, btn):
+        if btn.duck.timehere < 0:
+            btn.pos[0] += btn.velocity_x
+            btn.pos[1] += btn.velocity_y
+
+        else:
+            if btn.pos[0] > Window.size[0] - btn.texture.size[0]/1.5 + 1:
+                btn.pos[0] -= (btn.duck.rapidity *
+                               self.difficultymult())
+
+            btn.pos[0] += btn.velocity_x
+            btn.pos[1] += btn.velocity_y
+            if btn.touched:
+                btn.killed = True
+            if not btn.touched:
+                if btn.pos[0] < 0 or btn.pos[0] > (Window.size[0] -
+                                                   btn.texture.size[0]/1.5):
+                    btn.velocity_x *= -1
+                if btn.pos[1] < 0 or btn.pos[1] > (Window.size[1] -
+                                                   btn.texture.size[1]/1.5):
+                    btn.velocity_y *= -1
+
     def moveButtonDead(self):
         pass
-
-    def resetbutton(self, btn):
-        '''reset the position,the source image and the status of the button'''
-        btn.touched = False
-        btn.killed = False
-        btn.falling = False
-        btn.pos = (
-                random.uniform(
-                 Window.size[0], Window.size[0] + 600),
-                random.uniform(
-                 0, Window.size[1]-btn.texture.size[1]))
-        btn.source = self.assetpath + btn.duck.normalimg
 
     def difficultymult(self):
         '''return the dificulty multiplier for move the buttons'''
@@ -323,6 +356,7 @@ class ShootGame(App):
         self.addCibles(self.dkhard, 1)
         self.addCibles(self.dkbad, 3)
         self.addCibles(self.dkbonus, 1)
+        self.addCibles(self.dkcrasy, 1)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtimemode, 1)
@@ -371,11 +405,56 @@ class ShootGame(App):
         self.shootscreen.ids.timerlabel.color = (0, 0, 0, 1)
         self.mode = 'time'
 
+    def resetbutton(self, btn, pos_x=10000, crasy=False):
+        '''reset the position,the source image and the status of the button'''
+        btn.velocity_x = btn.duck.rapidity * self.difficultymult()
+        btn.velocity_y = btn.duck.rapidity * self.difficultymult()
+        btn.touched = False
+        btn.killed = False
+        btn.falling = False
+        btn.duck.timehere = random.randrange(btn.duck.timeheredefault[0],
+                                             btn.duck.timeheredefault[1])
+        btn.duck.timebeforespawn = \
+            (btn.duck.timehere +
+             random.randrange(btn.duck.timespawn[0], btn.duck.timespawn[1]))
+        btn.pos = (
+                random.uniform(
+                 Window.size[0], Window.size[0] + 600),
+                random.uniform(
+                 0, Window.size[1]-btn.texture.size[1]))
+        btn.source = self.assetpath + btn.duck.normalimg
+        if btn.duck.ducktype == 'crasy':
+            btn.pos = (Window.size[0] + pos_x, 200)
+
     def endtimemode(self, dt):
         '''check if the timer is ended'''
+        if self.screen_m.current != 'game':
+            return
+
+        # bt_crasy = None
+        for btn in self.shootscreen.children:
+            '''implement crasy duck clock'''
+            if isinstance(btn, TargetButton) and 'crasy' in btn.duck.ducktype:
+                # bt_crasy = btn
+                print(btn.pos[0])
+                print(btn.duck.timebeforespawn)
+                print(btn.duck.timehere)
+                btn.duck.timebeforespawn -= 1
+
+                if btn.duck.timebeforespawn < 0:
+                    self.resetbutton(btn, btn.texture.size[0], True)
+
+                btn.duck.timehere -= 1
+                if btn.duck.timehere < 0:
+                    pass
+
+        # if bt_crasy.duck.timebeforespawn > 200:
+        # bt_crasy.duck.timebeforespawn = 12
+
         if self.screen_m.current != 'game' or self.mode != 'time':
             pass
         else:
+
             if self.timer < 5:
                 self.shootscreen.ids.timerlabel.color = (1, 0, 0, 1)
             if self.timer > 0:
