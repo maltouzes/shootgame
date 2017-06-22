@@ -116,8 +116,8 @@ class TargetButton(ButtonBehavior, Image):
 
             self.touched = True
 
-        if shootgame.points < 0:
-            shootgame.points = 0
+        # if shootgame.points < 0:
+        # shootgame.points = 0
 
     def scoretotime(self):
         '''transform pts to time'''
@@ -133,12 +133,17 @@ class TargetButton(ButtonBehavior, Image):
             shootgame.lstscorebeforeaddtime = shootgame.points - scoreremain
 
     def displayptswin(self, pts):
+        if pts < 0:
+            shootgame.timer -= 2
+            shootgame.pointsdisplay += pts
         for w in shootgame.shootscreen.children:
             if isinstance(w, ScoreLabel):
                 x = self.pos[0] / Window.size[0]
                 y = self.pos[1] / Window.size[1]
                 w.pos_hint = {'center_x':  x, 'center_y': y}
                 w.text = str(pts)
+                w.timehere = 2
+                w.color = (1, 1, 1, 1)
 
     def deadanim(self):
         animation = Animation(pos=(
@@ -159,7 +164,7 @@ class TargetButton(ButtonBehavior, Image):
 
 
 class ScoreLabel(Label):
-    pass
+    timehere = 0
 
 
 class ShootScreen(Screen):
@@ -227,6 +232,7 @@ class ShootGame(App):
     shoot = SoundLoader.load(os.getcwd() + '/sound/shotgun.wav')
     soundbtn = SoundLoader.load(os.getcwd() + '/sound/push.ogg')
     timer = NumericProperty(0)
+    pointsdisplay = NumericProperty(0)
     scorelabel = ScoreLabel(text='', font_size='25sp')
     lstscorebeforeaddtime = 0
     scoretotime = 100  # pts = timeadd
@@ -405,6 +411,7 @@ class ShootGame(App):
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtimemode, 1)
         Clock.schedule_interval(self.moveButtons, 0.01)
+        Clock.schedule_interval(self.resetlabel, 0.01)
 
         return self.screen_m
 
@@ -473,6 +480,22 @@ class ShootGame(App):
         if btn.duck.ducktype == 'crasy':
             btn.pos = (Window.size[0] + pos_x, 200)
 
+    def resetlabel(self, dt):
+        if self.screen_m.current != 'game':
+            return
+
+        if self.pointsdisplay < self.points:
+            if self.pointsdisplay + 100 < self.points:
+                self.pointsdisplay += random.randint(1, 9)
+            else:
+                self.pointsdisplay += 1
+
+        # bt_crasy = None
+        for btn in self.shootscreen.children:
+            '''implement crasy duck clock'''
+            if isinstance(btn, ScoreLabel):
+                btn.color[3] -= dt
+
     def endtimemode(self, dt):
         '''check if the timer is ended'''
         if self.screen_m.current != 'game':
@@ -510,7 +533,7 @@ class ShootGame(App):
         '''add the button to the screen and reset their position. reset the
         points'''
         self.lstscorebeforeaddtime = 0
-        self.points = 0
+        self.points = self.pointsdisplay = 0
         self.scorelabel.text = ''
         self.resetButtons()
         self.screen_m.transition = SlideTransition()
