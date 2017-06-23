@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.13'
+__version__ = '0.0.17'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -31,6 +31,7 @@ import random
 # from kivy.utils import platform
 from kivy.uix.label import Label
 from kivy.properties import NumericProperty
+from kivy.properties import StringProperty
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
@@ -81,6 +82,12 @@ class Duck():
         self.timehere = 0
 
 
+class Hen(Duck):
+    def __init__(self, eggs, *args, **kwargs):
+        self.eggs = eggs
+        super().__init__(*args, **kwargs)
+
+
 class TargetButton(ButtonBehavior, Image):
     '''cibles for shoot, is composed of the Duck class'''
     def __init__(self, duck, *args, **kwargs):
@@ -96,6 +103,8 @@ class TargetButton(ButtonBehavior, Image):
 
     def on_press(self):
         '''check which duck is touched or not'''
+        if isinstance(self.duck, Hen):
+            self.duck.eggs -= 1
         shootgame.shoot.play()
         ptsmulti = shootgame.dificultypts
         if self.touched is True and self.killed is not True:
@@ -225,7 +234,8 @@ class ShootGame(App):
 
     layout = FloatLayout(size_hint=(1, 1))
     points = NumericProperty(0)
-    bestscore = 0
+    bestscore = NumericProperty(0)
+    newrecord = StringProperty('')
     dificulty = 'none'  # easy, medium and hard
     dificultypts = 1
     mode = 'none'  # arcade, time
@@ -236,7 +246,7 @@ class ShootGame(App):
     scorelabel = ScoreLabel(text='', font_size='25sp')
     lstscorebeforeaddtime = 0
     scoretotime = 100  # pts = timeadd
-    timeadd = 10  # sec added
+    timeadd = 1  # sec added
 
     def ducksinit(self):
         '''Initialize the cibles, with their
@@ -281,6 +291,11 @@ class ShootGame(App):
                             'birds/BirdSkull2-hit.gif',
                             [13, 16])
 
+        self.dkhen = Hen(3, 'hen', 0, 0, 1,
+                         'birds/BirdHen.gif',
+                         'birds/BirdHen.gif',
+                         'birds/BirdHen-hit.gif')
+
     def addCibles(self, duck, num):
         '''add the cibles take a duck parameter
         and add the coresponding duck multiplying the num parameter (number)'''
@@ -290,12 +305,15 @@ class ShootGame(App):
                     duck,
                     size_hint=(None, None),
                     source=self.assetpath + duck.hurtimg)
-            btn.source = self.assetpath + duck.normalimg  # load all img
-            btn.source = self.assetpath + duck.deadimg  # load all img
+            # btn.source = self.assetpath + duck.normalimg  # load all img
+            # btn.source = self.assetpath + duck.deadimg  # load all img
             if 'bomb' in btn.source:
                 btn.anim_loop = 1
 
             self.shootscreen.add_widget(btn)
+            btn.source = self.assetpath + duck.deadimg  # load all img
+            btn.source = self.assetpath + duck.hurtimg  # load all img
+            btn.source = self.assetpath + duck.normalimg  # load all img
 
     def resetButtons(self):
         '''reset all the buttons to their original position and their original
@@ -368,16 +386,16 @@ class ShootGame(App):
         '''return the dificulty multiplier for move the buttons'''
         if self.dificulty == 'easy':
             self.dificultypts = 1
-            return random.uniform(.8, 1)
+            return random.uniform(1, 2)
         elif self.dificulty == 'medium':
             self.dificultypts = 2
-            return random.uniform(1, 2)
+            return random.uniform(2, 3)
         elif self.dificulty == 'hard':
             self.dificultypts = 3
-            return random.uniform(2, 3)
+            return random.uniform(3, 4)
         else:
             self.dificultypts = 1
-            return random.uniform(.1, 2)  # easy
+            return random.uniform(1, 2)  # easy
 
     def build(self):
         '''create a ScreenManager and add all the Screens'''
@@ -407,6 +425,7 @@ class ShootGame(App):
         self.addCibles(self.dkbad, 3)
         self.addCibles(self.dkbonus, 1)
         self.addCibles(self.dkcrasy, 1)
+        # self.addCibles(self.dkhen, 1)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtimemode, 1)
@@ -423,19 +442,16 @@ class ShootGame(App):
     def starteasy(self):
         '''set dificulty'''
         self.dificulty = 'easy'
-        print(self.dificulty)
         self.start()
 
     def startmedium(self):
         '''set dificulty'''
         self.dificulty = 'medium'
-        print(self.dificulty)
         self.start()
 
     def starthard(self):
         '''set dificulty'''
         self.dificulty = 'hard'
-        print(self.dificulty)
         self.start()
 
     def arcademode(self):
@@ -486,15 +502,17 @@ class ShootGame(App):
 
         if self.pointsdisplay < self.points:
             if self.pointsdisplay + 100 < self.points:
-                self.pointsdisplay += random.randint(1, 9)
+                self.pointsdisplay += random.randint(1, 9) * self.dificultypts
             else:
                 self.pointsdisplay += 1
 
         # bt_crasy = None
         for btn in self.shootscreen.children:
             '''implement crasy duck clock'''
-            if isinstance(btn, ScoreLabel):
+            if isinstance(btn, ScoreLabel) and btn.color[3] > 0:
                 btn.color[3] -= dt
+                if btn.color[3] < 0:
+                    btn.color[3] = 0
 
     def endtimemode(self, dt):
         '''check if the timer is ended'''
@@ -527,6 +545,11 @@ class ShootGame(App):
             if self.timer > 0:
                 self.timer -= 1
             else:
+                if self.points > self.bestscore:
+                    self.bestscore = self.points
+                    self.newrecord = 'New Record !!!'
+                else:
+                    self.newrecord = ''
                 self.screen_m.current = 'win'
 
     def start(self):
@@ -576,7 +599,7 @@ class ShootGame(App):
 
     def loadscore(self):
         '''load a score from a file'''
-        if os.path.isfile('score'):
+        if os.path.isfile('scores'):
             with open('scores', 'r') as f:
                 self.bestscore = f
                 pass

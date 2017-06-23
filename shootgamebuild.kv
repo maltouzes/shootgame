@@ -126,7 +126,7 @@
 
     Label:
         text: 'Points ' + str(app.pointsdisplay)
-        pos_hint: {'center_x': 0.7, 'center_y': 0.9}
+        pos_hint: {'center_x': 0.6, 'center_y': 0.9}
         font_size: '25sp'
         markup: True
         color: 0, 0, 0, 1
@@ -156,12 +156,15 @@
             # source: app.background3
 
     Label:
-        text: "You Win!"
+        text: str(app.points)
         pos_hint: {'center_x': 0.5, 'center_y': 0.8}
+        font_size: '25sp'
 
     Label:
-        text: str(app.points)
+        text: str(app.newrecord)
         pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        font_size: '25sp'
+
 
     ImgButton:
         source: os.getcwd() + "/assets/yellow_button00.png"
