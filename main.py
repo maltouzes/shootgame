@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.19'
+__version__ = '0.0.20'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -47,6 +47,10 @@ from kivy.uix.screenmanager import FadeTransition
 from kivy.uix.screenmanager import SlideTransition
 from kivy.animation import Animation
 from kivy.lang import Builder
+try:
+    from plyer import vibrator
+except ImportError:
+    pass
 
 Window.size = (800, 460)
 
@@ -163,9 +167,14 @@ class TargetButton(ButtonBehavior, Image):
             shootgame.lstscorebeforeaddtime = shootgame.points - scoreremain
 
     def displayptswin(self, pts):
-        if pts < 0 and 'time' in shootgame.mode:
-            shootgame.timer -= 2
-            shootgame.pointsdisplay += pts
+        if pts < 0:
+            try:
+                vibrator.vibrate(0.1)
+            except NameError:
+                pass
+            if 'time' in shootgame.mode:
+                shootgame.timer -= 2
+                shootgame.pointsdisplay += pts
         for w in shootgame.shootscreen.children:
             if isinstance(w, ScoreLabel):
                 x = self.pos[0] / Window.size[0]
@@ -301,7 +310,7 @@ class ShootGame(App):
                             'birds/BirdGrey1-hit.gif',
                             'birds/BirdGrey1-hit.gif',
                             [13, 16],
-                            [3, 5])
+                            [2, 3])
 
         self.dkbad = Duck('bad', -300, 0, 2,  # pts, pts and rapidity
                           'PNG/bomb_6.png',
@@ -386,8 +395,8 @@ class ShootGame(App):
             btn.pos[1] += btn.velocity_y
 
         else:
-            if btn.pos[0] > Window.size[0] - btn.texture.size[0]/1.5 + 1:
-                btn.pos[0] -= (btn.duck.rapidity *
+            if btn.pos[0] < 0:
+                btn.pos[0] += (btn.duck.rapidity *
                                self.difficultymult())
 
             btn.pos[0] += btn.velocity_x
