@@ -37,7 +37,7 @@ from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.image import Image
+from kivy.uix.image import AsyncImage
 from kivy.core.window import Window
 # from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -55,7 +55,7 @@ except ImportError:
 Window.size = (800, 460)
 
 
-class ImgButton(ButtonBehavior, Image):
+class ImgButton(ButtonBehavior, AsyncImage):
     '''custom button use in kv lang for the gui'''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,7 +92,7 @@ class Hen(Duck):
         super().__init__(*args, **kwargs)
 
 
-class TargetButton(ButtonBehavior, Image):
+class TargetButton(ButtonBehavior, AsyncImage):
     '''cibles for shoot, is composed of the Duck class'''
     def __init__(self, duck, *args, **kwargs):
         '''initialize the Duck class parameter as duck (composition),
