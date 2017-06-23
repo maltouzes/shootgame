@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.18'
+__version__ = '0.0.19'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -153,7 +153,7 @@ class TargetButton(ButtonBehavior, Image):
         '''transform pts to time'''
         pointup = shootgame.points - shootgame.lstscorebeforeaddtime
         pointupdif = pointup/shootgame.dificultypts
-        if (pointupdif >= shootgame.scoretotime):
+        if (pointupdif >= shootgame.scoretotime) and 'time' in shootgame.mode:
             pointbyhundred = (round(pointup/100)*100)
             scoreremain = pointupdif - pointbyhundred
             timeadded = \
@@ -163,7 +163,7 @@ class TargetButton(ButtonBehavior, Image):
             shootgame.lstscorebeforeaddtime = shootgame.points - scoreremain
 
     def displayptswin(self, pts):
-        if pts < 0:
+        if pts < 0 and 'time' in shootgame.mode:
             shootgame.timer -= 2
             shootgame.pointsdisplay += pts
         for w in shootgame.shootscreen.children:
