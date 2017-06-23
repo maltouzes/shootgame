@@ -255,7 +255,7 @@ class ShootGame(App):
 
     layout = FloatLayout(size_hint=(1, 1))
     points = NumericProperty(0)
-    bestscore = NumericProperty(0)
+    bestscore = NumericProperty()
     newrecord = StringProperty('')
     dificulty = 'none'  # easy, medium and hard
     dificultypts = 1
@@ -368,10 +368,10 @@ class ShootGame(App):
                             if 'bomb' not in btn.source:
                                 btn.deadanim()
                         else:
-                            btn.pos[0] -= (btn.duck.rapidity *
+                            btn.pos[0] += (btn.duck.rapidity *
                                            self.difficultymult())
 
-                        if ((btn.pos[0] < -490 or
+                        if ((btn.pos[0] > Window.size[0] + 490 or
                             btn.pos[1] < 0 - btn.texture.size[1] or
                                 btn.pos[1] > (Window.size[1] +
                                               btn.texture.size[1])) and 'crasy'
@@ -454,6 +454,7 @@ class ShootGame(App):
         Clock.schedule_interval(self.endtimemode, 1)
         Clock.schedule_interval(self.moveButtons, 0.01)
         Clock.schedule_interval(self.resetlabel, 0.01)
+        self.loadscore()
 
         return self.screen_m
 
@@ -512,12 +513,12 @@ class ShootGame(App):
              random.randrange(btn.duck.timespawn[0], btn.duck.timespawn[1]))
         btn.pos = (
                 random.uniform(
-                 Window.size[0], Window.size[0] + 600),
+                 -btn.texture.size[0], 0 - 600),
                 random.uniform(
                  0, Window.size[1]-btn.texture.size[1]))
         btn.source = self.assetpath + btn.duck.normalimg
         if btn.duck.ducktype == 'crasy':
-            btn.pos = (Window.size[0] + pos_x, 200)
+            btn.pos = (0 - pos_x, 200)
 
     def resetlabel(self, dt):
         if self.screen_m.current != 'game':
@@ -525,9 +526,11 @@ class ShootGame(App):
 
         if self.pointsdisplay < self.points:
             if self.pointsdisplay + 100 < self.points:
-                self.pointsdisplay += random.randint(1, 9) * self.dificultypts
+                self.pointsdisplay += random.randint(5, 9) * self.dificultypts
             else:
-                self.pointsdisplay += 1
+                self.pointsdisplay += random.randint(1, 5)
+        else:  # self.pointsdisplay > self.points:
+            self.pointsdisplay = self.points
 
         # bt_crasy = None
         for btn in self.shootscreen.children:
@@ -626,9 +629,11 @@ class ShootGame(App):
     def loadscore(self):
         '''load a score from a file'''
         if os.path.isfile('scores'):
-            with open('scores', 'r') as f:
-                self.bestscore = f
-                pass
+            try:
+                with open('scores', 'r') as f:
+                    self.bestscore = float(f.readline())
+            except ValueError:
+                self.bestscore = 0
 
 
 if __name__ == '__main__':
