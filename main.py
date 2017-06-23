@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.17'
+__version__ = '0.0.18'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -110,9 +110,12 @@ class TargetButton(ButtonBehavior, Image):
         if self.touched is True and self.killed is not True:
             self.source = ShootGame.assetpath + self.duck.deadimg
             ptswin = self.duck.hurtpts * ptsmulti
-            shootgame.points += ptswin
-            self.displayptswin(ptswin)
+            self.shoottype(self.source)
+            ptswinmult = ptswin*self.multpointtype()
+            shootgame.points += ptswinmult
+            self.displayptswin(ptswinmult)
             self.scoretotime()
+            self.combo()
 
             self.killed = True
 
@@ -125,8 +128,26 @@ class TargetButton(ButtonBehavior, Image):
 
             self.touched = True
 
-        # if shootgame.points < 0:
-        # shootgame.points = 0
+    def combo(self):
+        combo = shootgame.shootscreen.ids.combolabel
+        if self.multpointtype() == 1:
+            combo.text = ''
+        else:
+            combo.text = 'Combo X' + str(self.multpointtype())
+
+    @staticmethod
+    def multpointtype():
+        if shootgame.multshoottype < 4:
+            return shootgame.multshoottype
+        else:
+            return 3
+
+    def shoottype(self, source):
+        if self.source == shootgame.lastshoottype:
+            shootgame.multshoottype += 1
+        else:
+            shootgame.multshoottype = 1
+            shootgame.lastshoottype = self.source
 
     def scoretotime(self):
         '''transform pts to time'''
@@ -247,6 +268,8 @@ class ShootGame(App):
     lstscorebeforeaddtime = 0
     scoretotime = 100  # pts = timeadd
     timeadd = 1  # sec added
+    lastshoottype = None
+    multshoottype = 1
 
     def ducksinit(self):
         '''Initialize the cibles, with their
@@ -555,6 +578,9 @@ class ShootGame(App):
     def start(self):
         '''add the button to the screen and reset their position. reset the
         points'''
+        self.lastshoottype = None
+        self.multshoottype = 1
+
         self.lstscorebeforeaddtime = 0
         self.points = self.pointsdisplay = 0
         self.scorelabel.text = ''
