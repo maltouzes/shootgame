@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.20'
+__version__ = '0.0.21'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -37,7 +37,8 @@ from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.image import AsyncImage
+# from kivy.uix.image import AsyncImage
+from kivy.uix.image import Image
 from kivy.core.window import Window
 # from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -55,7 +56,7 @@ except ImportError:
 Window.size = (800, 460)
 
 
-class ImgButton(ButtonBehavior, AsyncImage):
+class ImgButton(ButtonBehavior, Image):
     '''custom button use in kv lang for the gui'''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,7 +93,7 @@ class Hen(Duck):
         super().__init__(*args, **kwargs)
 
 
-class TargetButton(ButtonBehavior, AsyncImage):
+class TargetButton(ButtonBehavior, Image):
     '''cibles for shoot, is composed of the Duck class'''
     def __init__(self, duck, *args, **kwargs):
         '''initialize the Duck class parameter as duck (composition),
@@ -258,10 +259,6 @@ class ShootGame(App):
     background2 = assetpath + ("background/1.png")
     background3 = assetpath + ("background/4.png")
 
-    '''background = assetpath + ("PNG/Background_Orange.png")
-    background1 = assetpath + ("PNG/Background_Blue.png")
-    background2 = assetpath + ("PNG/Water.png")'''
-
     layout = FloatLayout(size_hint=(1, 1))
     points = NumericProperty(0)
     bestscore = NumericProperty()
@@ -291,42 +288,42 @@ class ShootGame(App):
         :param deadimg: img when the duck is dead
         '''
         self.dkeasy = Duck('easy', 30, 50, 1,  # pts, pts and rapidity
-                           'birds/BirdGreen.gif',
-                           'birds/BirdGreen-hit.gif',
-                           'birds/BirdGreen-hit.gif')
+                           'birds/BirdGreen-idle.zip',
+                           'birds/BirdGreen-hit.zip',
+                           'birds/BirdGreen-hit.zip')
 
         self.dkmedium = Duck('medium', 40, 100, 1.3,  # pts, pts and rapidity
-                             'birds/BirdYellow.gif',
-                             'birds/BirdYellow-hit.gif',
-                             'birds/BirdYellow-hit.gif')
+                             'birds/BirdYellow-idle.zip',
+                             'birds/BirdYellow-hit.zip',
+                             'birds/BirdYellow-hit.zip')
 
         self.dkhard = Duck('hard', 10, 300, 2,  # pts, pts and rapidity
-                           'birds/BirdPurple.gif',
-                           'birds/BirdPurple-hit.gif',
-                           'birds/BirdPurple-hit.gif')
+                           'birds/BirdPurple-idle.zip',
+                           'birds/BirdPurple-hit.zip',
+                           'birds/BirdPurple-hit.zip')
 
         self.dkbonus = Duck('crasy', 1000, 0, 3,
-                            'birds/BirdGrey1.gif',
-                            'birds/BirdGrey1-hit.gif',
-                            'birds/BirdGrey1-hit.gif',
+                            'birds/BirdGrey1-idle.zip',
+                            'birds/BirdGrey1-hit.zip',
+                            'birds/BirdGrey1-hit.zip',
                             [13, 16],
                             [2, 3])
 
         self.dkbad = Duck('bad', -300, 0, 2,  # pts, pts and rapidity
                           'PNG/bomb_6.png',
-                          'PNG/bomb_dead.gif',
-                          'PNG/bomb_dead.gif')
+                          'targets/bomb_dead.zip',
+                          'targets/bomb_dead.zip')
 
         self.dkcrasy = Duck('crasy', -300, 0, 2,
-                            'birds/BirdSkull2.gif',
-                            'birds/BirdSkull2-hit.gif',
-                            'birds/BirdSkull2-hit.gif',
+                            'birds/BirdSkull2-idle.zip',
+                            'birds/BirdSkull2-hit.zip',
+                            'birds/BirdSkull2-hit.zip',
                             [13, 16])
 
         self.dkhen = Hen(3, 'hen', 0, 0, 1,
-                         'birds/BirdHen.gif',
-                         'birds/BirdHen.gif',
-                         'birds/BirdHen-hit.gif')
+                         'birds/BirdHen-idle.zip',
+                         'targets/BirdHen-hit.zip',
+                         'targets/BirdHen-hit.zip')
 
     def addCibles(self, duck, num):
         '''add the cibles take a duck parameter
@@ -337,14 +334,11 @@ class ShootGame(App):
                     duck,
                     size_hint=(None, None),
                     source=self.assetpath + duck.hurtimg)
-            # btn.source = self.assetpath + duck.normalimg  # load all img
-            # btn.source = self.assetpath + duck.deadimg  # load all img
             if 'bomb' in btn.source:
                 btn.anim_loop = 1
 
             self.shootscreen.add_widget(btn)
             btn.source = self.assetpath + duck.deadimg  # load all img
-            btn.source = self.assetpath + duck.hurtimg  # load all img
             btn.source = self.assetpath + duck.normalimg  # load all img
 
     def resetButtons(self):
@@ -366,7 +360,6 @@ class ShootGame(App):
             pass
         else:
             for btn in self.shootscreen.children:
-
                 try:
                     if btn.duck.ducktype == 'crasy':
                         self.movebuttoncrasy(btn)
@@ -524,7 +517,7 @@ class ShootGame(App):
                 random.uniform(
                  -btn.texture.size[0], 0 - 600),
                 random.uniform(
-                 0, Window.size[1]-btn.texture.size[1]))
+                 0+btn.texture.size[1], Window.size[1]-btn.texture.size[1]))
         btn.source = self.assetpath + btn.duck.normalimg
         if btn.duck.ducktype == 'crasy':
             btn.pos = (0 - pos_x, 200)
