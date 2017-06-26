@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.21'
+__version__ = '0.0.22'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -115,11 +115,11 @@ class TargetButton(ButtonBehavior, Image):
         if self.touched is True and self.killed is not True:
             self.source = ShootGame.assetpath + self.duck.deadimg
             ptswin = self.duck.hurtpts * ptsmulti
-            self.shoottype(self.source)
-            ptswinmult = ptswin*self.multpointtype()
+            self.shoot_type(self.source)
+            ptswinmult = ptswin*self.mult_pts_type()
             shootgame.points += ptswinmult
-            self.displayptswin(ptswinmult)
-            self.scoretotime()
+            self.display_pts_win(ptswinmult)
+            self.score_to_time()
             self.combo()
 
             self.killed = True
@@ -128,46 +128,47 @@ class TargetButton(ButtonBehavior, Image):
             self.source = ShootGame.assetpath + self.duck.hurtimg
             ptswin = self.duck.normalpts * ptsmulti
             shootgame.points += ptswin
-            self.displayptswin(ptswin)
-            self.scoretotime()
+            self.display_pts_win(ptswin)
+            self.score_to_time()
 
             self.touched = True
 
     def combo(self):
         combo = shootgame.shootscreen.ids.combolabel
-        if self.multpointtype() == 1:
+        if self.mult_pts_type() == 1:
             combo.text = ''
         else:
-            combo.text = 'Combo X' + str(self.multpointtype())
+            combo.text = 'Combo X' + str(self.mult_pts_type())
 
     @staticmethod
-    def multpointtype():
-        if shootgame.multshoottype < 4:
-            return shootgame.multshoottype
+    def mult_pts_type():
+        if shootgame.multshoot_type < 4:
+            return shootgame.multshoot_type
         else:
             return 3
 
-    def shoottype(self, source):
-        if self.source == shootgame.lastshoottype:
-            shootgame.multshoottype += 1
+    def shoot_type(self, source):
+        if self.source == shootgame.lastshoot_type:
+            shootgame.multshoot_type += 1
         else:
-            shootgame.multshoottype = 1
-            shootgame.lastshoottype = self.source
+            shootgame.multshoot_type = 1
+            shootgame.lastshoot_type = self.source
 
-    def scoretotime(self):
+    def score_to_time(self):
         '''transform pts to time'''
         pointup = shootgame.points - shootgame.lstscorebeforeaddtime
         pointupdif = pointup/shootgame.dificultypts
-        if (pointupdif >= shootgame.scoretotime) and 'time' in shootgame.mode:
+        if ((pointupdif >= shootgame.score_to_time)
+                and 'time' in shootgame.mode):
             pointbyhundred = (round(pointup/100)*100)
             scoreremain = pointupdif - pointbyhundred
             timeadded = \
                 (shootgame.timeadd *
-                 int(round(pointupdif/shootgame.scoretotime)))
+                 int(round(pointupdif/shootgame.score_to_time)))
             shootgame.timer += timeadded
             shootgame.lstscorebeforeaddtime = shootgame.points - scoreremain
 
-    def displayptswin(self, pts):
+    def display_pts_win(self, pts):
         if pts < 0:
             try:
                 vibrator.vibrate(0.1)
@@ -185,7 +186,7 @@ class TargetButton(ButtonBehavior, Image):
                 w.timehere = 2
                 w.color = (1, 1, 1, 1)
 
-    def deadanim(self):
+    def dead_anim(self):
         animation = Animation(pos=(
             self.pos[0] - self.size[0]/2, self.pos[1] + self.size[1]/2),
             t='linear',
@@ -272,12 +273,12 @@ class ShootGame(App):
     pointsdisplay = NumericProperty(0)
     scorelabel = ScoreLabel(text='', font_size='25sp')
     lstscorebeforeaddtime = 0
-    scoretotime = 100  # pts = timeadd
+    score_to_time = 100  # pts = timeadd
     timeadd = 1  # sec added
-    lastshoottype = None
-    multshoottype = 1
+    lastshoot_type = None
+    multshoot_type = 1
 
-    def ducksinit(self):
+    def ducks_init(self):
         '''Initialize the cibles, with their
         :param type: easy, medium, hard or bad
         :type: normalpts: int
@@ -311,8 +312,8 @@ class ShootGame(App):
 
         self.dkbad = Duck('bad', -300, 0, 2,  # pts, pts and rapidity
                           'PNG/bomb_6.png',
-                          'targets/bomb_dead.zip',
-                          'targets/bomb_dead.zip')
+                          'PNG/bomb_dead.zip',
+                          'PNG/bomb_dead.zip')
 
         self.dkcrasy = Duck('crasy', -300, 0, 2,
                             'birds/BirdSkull2-idle.zip',
@@ -325,7 +326,7 @@ class ShootGame(App):
                          'targets/BirdHen-hit.zip',
                          'targets/BirdHen-hit.zip')
 
-    def addCibles(self, duck, num):
+    def add_cibles(self, duck, num):
         '''add the cibles take a duck parameter
         and add the coresponding duck multiplying the num parameter (number)'''
 
@@ -341,7 +342,7 @@ class ShootGame(App):
             btn.source = self.assetpath + duck.deadimg  # load all img
             btn.source = self.assetpath + duck.normalimg  # load all img
 
-    def resetButtons(self):
+    def reset_buttons(self):
         '''reset all the buttons to their original position and their original
         source image'''
         for btn in self.shootscreen.children:
@@ -349,11 +350,11 @@ class ShootGame(App):
                     # 'crasy' not in btn.duck.ducktype):
                 try:
                     if 'Bird' in btn.source or 'bomb' in btn.source:
-                        self.resetbutton(btn)
+                        self.reset_btn(btn)
                 except AttributeError:
                     pass
 
-    def moveButtons(self, dt):
+    def move_buttons(self, dt):
         '''move every buttons (cibles) in the screen according to the dificulty
         and the rapidity of the cibles'''
         if self.screen_m.current != 'game':
@@ -362,27 +363,27 @@ class ShootGame(App):
             for btn in self.shootscreen.children:
                 try:
                     if btn.duck.ducktype == 'crasy':
-                        self.movebuttoncrasy(btn)
+                        self.move_btn_crasy(btn)
                     elif 'Bird' in btn.source or 'bomb' in btn.source:
                         # if 'bonus' in btn.source
                         if btn.killed and not btn.falling:
                             btn.falling = True
                             if 'bomb' not in btn.source:
-                                btn.deadanim()
+                                btn.dead_anim()
                         else:
                             btn.pos[0] += (btn.duck.rapidity *
-                                           self.difficultymult())
+                                           self.diffic_mult())
 
                         if ((btn.pos[0] > Window.size[0] + 490 or
                             btn.pos[1] < 0 - btn.texture.size[1] or
                                 btn.pos[1] > (Window.size[1] +
                                               btn.texture.size[1])) and 'crasy'
                                 not in btn.duck.ducktype):
-                                self.resetbutton(btn)
+                                self.reset_btn(btn)
                 except AttributeError:
                     pass
 
-    def movebuttoncrasy(self, btn):
+    def move_btn_crasy(self, btn):
         if btn.duck.timehere < 0:
             btn.pos[0] += btn.velocity_x
             btn.pos[1] += btn.velocity_y
@@ -390,7 +391,7 @@ class ShootGame(App):
         else:
             if btn.pos[0] < 0:
                 btn.pos[0] += (btn.duck.rapidity *
-                               self.difficultymult())
+                               self.diffic_mult())
 
             btn.pos[0] += btn.velocity_x
             btn.pos[1] += btn.velocity_y
@@ -404,10 +405,10 @@ class ShootGame(App):
                                                    btn.texture.size[1]/1.5):
                     btn.velocity_y *= -1
 
-    def moveButtonDead(self):
+    def move_button_dead(self):
         pass
 
-    def difficultymult(self):
+    def diffic_mult(self):
         '''return the dificulty multiplier for move the buttons'''
         if self.dificulty == 'easy':
             self.dificultypts = 1
@@ -440,23 +441,23 @@ class ShootGame(App):
         self.screen_m.add_widget(WinScreen(name='win'))
         self.screen_m.add_widget(self.shootscreen)
 
-        self.ducksinit()
+        self.ducks_init()
 
         # self.shootscreen.add_widget(ScoreLabel(text='', font_size='25sp'))
         self.shootscreen.add_widget(self.scorelabel)
-        self.addCibles(self.dkeasy, 5)
-        self.addCibles(self.dkmedium, 3)
-        self.addCibles(self.dkhard, 1)
-        self.addCibles(self.dkbad, 3)
-        self.addCibles(self.dkbonus, 1)
-        self.addCibles(self.dkcrasy, 1)
-        # self.addCibles(self.dkhen, 1)
+        self.add_cibles(self.dkeasy, 5)
+        self.add_cibles(self.dkmedium, 3)
+        self.add_cibles(self.dkhard, 1)
+        self.add_cibles(self.dkbad, 3)
+        self.add_cibles(self.dkbonus, 1)
+        self.add_cibles(self.dkcrasy, 1)
+        # self.add_cibles(self.dkhen, 1)
 
         self.screen_m.current = 'menu'
-        Clock.schedule_interval(self.endtimemode, 1)
-        Clock.schedule_interval(self.moveButtons, 0.01)
-        Clock.schedule_interval(self.resetlabel, 0.01)
-        self.loadscore()
+        Clock.schedule_interval(self.endtime_mode, 1)
+        Clock.schedule_interval(self.move_buttons, 0.01)
+        Clock.schedule_interval(self.reset_label, 0.01)
+        self.load_score()
 
         return self.screen_m
 
@@ -465,22 +466,22 @@ class ShootGame(App):
         from kivy.base import EventLoop
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
 
-    def starteasy(self):
+    def start_easy(self):
         '''set dificulty'''
         self.dificulty = 'easy'
         self.start()
 
-    def startmedium(self):
+    def start_medium(self):
         '''set dificulty'''
         self.dificulty = 'medium'
         self.start()
 
-    def starthard(self):
+    def start_hard(self):
         '''set dificulty'''
         self.dificulty = 'hard'
         self.start()
 
-    def arcademode(self):
+    def arcade_mode(self):
         '''remove the timer from the screen'''
         # self.screen_m.transition = SlideTransition()
 
@@ -492,7 +493,7 @@ class ShootGame(App):
         self.screen_m.transition.direction = 'left'
         self.mode = 'arcade'
 
-    def timemode(self):
+    def time_mode(self):
         '''initialize the timer'''
         self.screen_m.transition = SlideTransition()
         self.screen_m.transition.direction = 'left'
@@ -501,10 +502,10 @@ class ShootGame(App):
         self.shootscreen.ids.timerlabel.color = (0, 0, 0, 1)
         self.mode = 'time'
 
-    def resetbutton(self, btn, pos_x=10000, crasy=False):
+    def reset_btn(self, btn, pos_x=10000, crasy=False):
         '''reset the position,the source image and the status of the button'''
-        btn.velocity_x = btn.duck.rapidity * self.difficultymult()
-        btn.velocity_y = btn.duck.rapidity * self.difficultymult()
+        btn.velocity_x = btn.duck.rapidity * self.diffic_mult()
+        btn.velocity_y = btn.duck.rapidity * self.diffic_mult()
         btn.touched = False
         btn.killed = False
         btn.falling = False
@@ -522,7 +523,7 @@ class ShootGame(App):
         if btn.duck.ducktype == 'crasy':
             btn.pos = (0 - pos_x, 200)
 
-    def resetlabel(self, dt):
+    def reset_label(self, dt):
         if self.screen_m.current != 'game':
             return
 
@@ -542,7 +543,7 @@ class ShootGame(App):
                 if btn.color[3] < 0:
                     btn.color[3] = 0
 
-    def endtimemode(self, dt):
+    def endtime_mode(self, dt):
         '''check if the timer is ended'''
         if self.screen_m.current != 'game':
             return
@@ -555,7 +556,7 @@ class ShootGame(App):
                 btn.duck.timebeforespawn -= 1
 
                 if btn.duck.timebeforespawn < 0:
-                    self.resetbutton(btn, btn.texture.size[0], True)
+                    self.reset_btn(btn, btn.texture.size[0], True)
 
                 btn.duck.timehere -= 1
                 if btn.duck.timehere < 0:
@@ -584,13 +585,13 @@ class ShootGame(App):
         '''add the button to the screen and reset their position. reset the
         points'''
         shootgame.shootscreen.ids.combolabel.text = ''
-        self.lastshoottype = None
-        self.multshoottype = 1
+        self.lastshoot_type = None
+        self.multshoot_type = 1
 
         self.lstscorebeforeaddtime = 0
         self.points = self.pointsdisplay = 0
         self.scorelabel.text = ''
-        self.resetButtons()
+        self.reset_buttons()
         self.screen_m.transition = SlideTransition()
         self.screen_m.transition.direction = 'up'
 
@@ -613,23 +614,23 @@ class ShootGame(App):
 
     def on_pause(self):
         '''Enable pause on Android'''
-        self.savescore()
+        self.save_score()
         return True
 
     def on_stop(self):
         '''save score when the app stop'''
-        self.savescore()
+        self.save_score()
 
     def on_resume(self):
         '''Resume after on_pause on Android'''
         pass
 
-    def savescore(self):
+    def save_score(self):
         '''save the score to a file'''
         with open('scores', 'w') as f:
             f.write(str(self.bestscore))
 
-    def loadscore(self):
+    def load_score(self):
         '''load a score from a file'''
         if os.path.isfile('scores'):
             try:

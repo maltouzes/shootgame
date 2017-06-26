@@ -20,7 +20,7 @@
         on_press: root.manager.current = 'level'
         on_release:
             app.root.transition = SlideTransition(direction='right')
-        on_press: app.arcademode()
+        on_press: app.arcade_mode()
     Label:
         text: "Arcade"
         pos_hint: {'center_x': 0.5, 'center_y': 0.8}
@@ -29,7 +29,7 @@
         source: os.getcwd() + "/assets/UIpack/PNG/green_button00.png"
         pos_hint: {'center_x': 0.5, 'center_y': 0.6}
         on_press: root.manager.current = 'level'
-        on_press: app.timemode()
+        on_press: app.time_mode()
         # size_hint: 1.2, None
     Label:
         text: "Time"
@@ -58,7 +58,7 @@
         source: os.getcwd() + "/assets/UIpack/PNG/green_button00.png"
         pos_hint: {'center_x': 0.3, 'center_y': 0.7}
         on_press: root.manager.current = 'game'
-        on_press: app.starteasy()
+        on_press: app.start_easy()
         # size_hint: 1.2, None
     Label:
         text: "Easy"
@@ -68,7 +68,7 @@
         source: os.getcwd() + "/assets/UIpack/PNG/yellow_button00.png"
         pos_hint: {'center_x': 0.7, 'center_y': 0.7}
         on_press: root.manager.current = 'game'
-        on_press: app.startmedium()
+        on_press: app.start_medium()
         # size_hint: 1.2, None
     Label:
         text: "Medium"
@@ -78,7 +78,7 @@
         source: os.getcwd() + "/assets/UIpack/PNG/red_button00.png"
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         on_press: root.manager.current = 'game'
-        on_press: app.starthard()
+        on_press: app.start_hard()
         # size_hint: 1.2, None
     Label:
         text: "Hard"
