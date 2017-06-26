@@ -216,8 +216,8 @@ class ShootScreen(Screen):
             return False
         shootgame.shoot.play()
         shootgame.points -= 1
-        if shootgame.points < 0:
-            shootgame.points = 0
+        # if shootgame.points < 0:
+        # shootgame.points = 0
         return True
 
     pass
@@ -590,6 +590,7 @@ class ShootGame(App):
     def start(self):
         '''add the button to the screen and reset their position. reset the
         points'''
+        shootgame.shootscreen.ids.combolabel.text = ''
         self.lastshoottype = None
         self.multshoottype = 1
 
