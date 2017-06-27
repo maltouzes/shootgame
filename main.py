@@ -128,6 +128,7 @@ class TargetButton(ButtonBehavior, Image):
     touched = False  # keep this here
     killed = False   # heep this here
     falling = False
+    animation = None
 
     def on_press(self):
         '''check which duck is touched or not'''
@@ -219,6 +220,34 @@ class TargetButton(ButtonBehavior, Image):
                 w.text = str(pts)
                 w.timehere = 2
                 w.color = (1, 1, 1, 1)
+
+    def hen_anim(self):
+        if not shootgame.end_anim:
+            shootgame.end_anim = True
+            win = Window.size
+
+            self.animation = Animation(pos=(
+                win[0]/2, win[1]/2),
+                t='linear',
+                duration=3)
+
+            for x in range(5):
+                self.animation += Animation(pos=(
+                    random.uniform(win[0]/2, win[0] - self.size[0]),
+                    random.uniform(win[1]/1.3, win[1]/8)),
+                    t='linear',
+                    duration=1)
+
+                self.animation += Animation(pos=(
+                    random.uniform(0 + self.size[0], win[0]/2),
+                    random.uniform(win[1]/1.3, win[1]/8)),
+                    t='linear',
+                    duration=1)
+
+            self.animation.start(self)
+
+    def hen_stop_anim(self):
+        self.animation.stop(self)
 
     def dead_anim(self):
         '''anim when btn killed is True'''
@@ -330,6 +359,7 @@ class ShootGame(App):
     lastshoot_type = None
     multshoot_type = 1
     multshoot_time = 3
+    end_anim = False
 
     def ducks_init(self):
         '''Initialize the cibles, with their
@@ -433,7 +463,9 @@ class ShootGame(App):
         image'''
         for btn in self.shootscreen.children:
             if isinstance(btn, TargetButton):  # and
-                    # 'crasy' not in btn.duck.ducktype):
+                # 'crasy' not in btn.duck.ducktype):
+                if btn.duck.ducktype == 'hen' and btn.animation:
+                    btn.hen_stop_anim()
                 try:
                     if ('Bird' in btn.duck.targettype or
                             'bomb' in btn.duck.targettype):
@@ -567,7 +599,7 @@ class ShootGame(App):
         self.add_targets(self.dkbonus, 1)
         self.add_targets(self.dkcrasy, 1)
         self.add_targets(self.dkbad, 3)
-        # self.add_targets(self.dkhen, 1)
+        self.add_targets(self.dkhen, 1)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtime_mode, 1)
@@ -650,7 +682,7 @@ class ShootGame(App):
         self.screen_m.transition = SlideTransition()
         self.screen_m.transition.direction = 'left'
         self.shootscreen.ids.timerlabel.text = 'Time ' + str(self.timer)
-        self.timer = 21
+        self.timer = 2
         self.shootscreen.ids.timerlabel.color = (0, 0, 0, 1)
         self.mode = 'time'
 
@@ -769,16 +801,24 @@ class ShootGame(App):
             if self.timer > 0:
                 self.timer -= 1
             else:
+                for btn in self.shootscreen.children:
+                    if(isinstance(btn, TargetButton) and
+                            btn.duck.ducktype == 'hen'):
+                        btn.hen_anim()
+
+                        '''
                 if self.points > self.bestscore:
                     self.bestscore = self.points
                     self.newrecord = 'New Record !!!'
                 else:
                     self.newrecord = ''
                 self.screen_m.current = 'win'
+                '''
 
     def start(self):
         '''add the button to the screen and reset their position. reset the
         points'''
+        self.end_anim = False
         shootgame.shootscreen.ids.combolabel.text = ''
         self.lastshoot_type = None
         self.multshoot_type = 1
