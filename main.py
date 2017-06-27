@@ -326,7 +326,7 @@ class ShootGame(App):
                          'targets/BirdHen-hit.zip',
                          'targets/BirdHen-hit.zip')
 
-    def add_cibles(self, duck, num):
+    def add_targets(self, duck, num):
         '''add the cibles take a duck parameter
         and add the coresponding duck multiplying the num parameter (number)'''
 
@@ -457,13 +457,13 @@ class ShootGame(App):
 
         # self.shootscreen.add_widget(ScoreLabel(text='', font_size='25sp'))
         self.shootscreen.add_widget(self.scorelabel)
-        self.add_cibles(self.dkeasy, 5)
-        self.add_cibles(self.dkmedium, 3)
-        self.add_cibles(self.dkhard, 1)
-        self.add_cibles(self.dkbad, 3)
-        self.add_cibles(self.dkbonus, 1)
-        self.add_cibles(self.dkcrasy, 1)
-        # self.add_cibles(self.dkhen, 1)
+        self.add_targets(self.dkeasy, 5)
+        self.add_targets(self.dkmedium, 3)
+        self.add_targets(self.dkhard, 1)
+        self.add_targets(self.dkbad, 3)
+        self.add_targets(self.dkbonus, 1)
+        self.add_targets(self.dkcrasy, 1)
+        # self.add_targets(self.dkhen, 1)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtime_mode, 1)
