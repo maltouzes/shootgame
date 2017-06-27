@@ -374,6 +374,9 @@ class ShootGame(App):
                             btn.pos[0] += (btn.duck.rapidity *
                                            self.diffic_mult())
 
+                            if btn.duck.ducktype == 'medium':
+                                self.move_diagonal(btn)
+
                         if ((btn.pos[0] > Window.size[0] + 490 or
                             btn.pos[1] < 0 - btn.texture.size[1] or
                                 btn.pos[1] > (Window.size[1] +
@@ -382,6 +385,15 @@ class ShootGame(App):
                                 self.reset_btn(btn)
                 except AttributeError:
                     pass
+
+    def move_diagonal(self, btn):
+        btn.pos[1] += btn.velocity_y
+
+        if (btn.pos[1] < 0 or
+                btn.pos[1] >
+                (Window.size[1]
+                    - btn.texture.size[1]/1.5)):
+            btn.velocity_y *= -1
 
     def move_btn_crasy(self, btn):
         if btn.duck.timehere < 0:
@@ -523,10 +535,11 @@ class ShootGame(App):
         if btn.duck.ducktype == 'crasy':
             a = (btn.duck.rapidity * self.diffic_mult())
             b = (btn.duck.rapidity * - self.diffic_mult())
-            btn.velocity_y = (random.choice([a, b]))
+            # btn.velocity_y = (random.choice([a, b]))
+            btn.velocity_y = (random.uniform(a, b))
             btn.pos = (
                     0 - pos_x,
-                    random.randint(
+                    random.uniform(
                         btn.texture.size[1],
                         Window.size[1] - btn.texture.size[1]))
 
