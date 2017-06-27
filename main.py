@@ -521,7 +521,14 @@ class ShootGame(App):
                  0+btn.texture.size[1], Window.size[1]-btn.texture.size[1]))
         btn.source = self.assetpath + btn.duck.normalimg
         if btn.duck.ducktype == 'crasy':
-            btn.pos = (0 - pos_x, 200)
+            a = (btn.duck.rapidity * self.diffic_mult())
+            b = (btn.duck.rapidity * - self.diffic_mult())
+            btn.velocity_y = (random.choice([a, b]))
+            btn.pos = (
+                    0 - pos_x,
+                    random.randint(
+                        btn.texture.size[1],
+                        Window.size[1] - btn.texture.size[1]))
 
     def reset_label(self, dt):
         if self.screen_m.current != 'game':
