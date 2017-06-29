@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.22'
+__version__ = '0.0.23'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -70,7 +70,7 @@ class Duck():
     '''handle all variables, TargetButton use composition for use Duck'''
     def __init__(self, targettype, ducktype, normalpoints, hurtpoints,
                  rapidity, normalimg, hurtimg, deadimg,
-                 timespawn=[4, 8], timehere=[8, 13], nbr_img=2):
+                 nbr_img=1, nbr_img_hit=1, timespawn=[4, 8], timehere=[8, 13]):
         '''initialize all variables'''
         self.targettype = targettype
         self.normalimg = normalimg
@@ -87,13 +87,8 @@ class Duck():
         self.timebeforespawn = 1000
         self.timehere = 0
         self.nbr_img = nbr_img
+        self.nbr_img_hit = nbr_img_hit
         self.index = 0
-
-    def update_img(self):
-        if self.index < self.nbr_img:
-            self.index += 1
-        else:
-            self.index = 0
 
 
 class Hen(Duck):
@@ -115,6 +110,17 @@ class TargetButton(ButtonBehavior, Image):
     killed = False   # heep this here
     falling = False
 
+    def update_img(self, btn):
+        if self.touched:
+            nbr = self.duck.nbr_img
+        else:
+            nbr = self.duck.nbr_img_hit
+
+        if self.duck.index < nbr:
+            self.duck.index += 1
+        else:
+            self.duck.index = 0
+
     def on_press(self):
         '''check which duck is touched or not'''
         # print(self.last_touch)
@@ -125,7 +131,10 @@ class TargetButton(ButtonBehavior, Image):
         shootgame.shoot.play()
         ptsmulti = shootgame.dificultypts
         if self.touched is True and self.killed is not True:
-            self.source = ShootGame.assetpath + self.duck.deadimg
+            # self.source = ShootGame.assetpath + self.duck.deadimg
+            self.source = ('atlas://' + shootgame.assetpath +
+                           self.duck.deadimg + str(0))
+
             ptswin = self.duck.hurtpts * ptsmulti
             self.shoot_type(self.source)
             ptswinmult = ptswin*self.mult_pts_type()
@@ -137,7 +146,9 @@ class TargetButton(ButtonBehavior, Image):
             self.killed = True
 
         elif self.touched is False:
-            self.source = ShootGame.assetpath + self.duck.hurtimg
+            # self.source = ShootGame.assetpath + self.duck.hurtimg
+            self.source = ('atlas://' + shootgame.assetpath +
+                           self.duck.hurtimg + str(0))
             ptswin = self.duck.normalpts * ptsmulti
             shootgame.points += ptswin
             self.display_pts_win(ptswin)
@@ -300,50 +311,50 @@ class ShootGame(App):
         :param hurtmalimg: img of the duck is hurted
         :param deadimg: img when the duck is dead
         '''
-        self.dkeasy = Duck('Bird', 'easy', 30, 50, 1,  # pts, pts and rapidity
-                           # 'birds/BirdGreen-idle.zip',
-                           # 'birds/BirdGreen-hit.zip',
-                           # 'birds/BirdGreen-hit.zip')
-                           # ('atlas://' + self.assetpath +
-                           #  'atlas/myatlas/BirdGreen-idle-0'),
-                           # ('atlas://' + self.assetpath +
-                           #  'atlas/myatlas/BirdGreen-idle-0'))
-                           'atlas/myatlas/BirdGreen-idle-0',
-                           'atlas/myatlas/BirdGreen-idle-0',
-                           'atlas/myatlas/BirdGreen-idle-0')
+        self.dkeasy = Duck('Bird', 'easy', 30, 50, 1,
+                           'atlas/myatlas/BirdGreen-idle-',
+                           'atlas/myatlas/BirdGreen-hit-',
+                           'atlas/myatlas/BirdGreen-hit-',
+                           2, 2)
 
         self.dkmedium = Duck('Bird', 'medium', 40, 100, 1.3,
-                             'birds/BirdYellow-idle.zip',
-                             'birds/BirdYellow-hit.zip',
-                             'birds/BirdYellow-hit.zip')
+                             'atlas/myatlas/BirdYellow-idle-',
+                             'atlas/myatlas/BirdYellow-hit-',
+                             'atlas/myatlas/BirdYellow-hit-',
+                             7, 2)
 
         self.dkhard = Duck('Bird', 'hard', 10, 300, 2,  # pts, pts and rapidity
-                           'birds/BirdPurple-idle.zip',
-                           'birds/BirdPurple-hit.zip',
-                           'birds/BirdPurple-hit.zip')
+                           'atlas/myatlas/BirdPurple-idle-',
+                           'atlas/myatlas/BirdPurple-hit-',
+                           'atlas/myatlas/BirdPurple-hit-',
+                           2, 2)
 
         self.dkbonus = Duck('Bird', 'crasy', 1000, 0, 3,
-                            'birds/BirdGrey1-idle.zip',
-                            'birds/BirdGrey1-hit.zip',
-                            'birds/BirdGrey1-hit.zip',
+                            'atlas/myatlas/BirdGrey1-idle-',
+                            'atlas/myatlas/BirdGrey1-hit-',
+                            'atlas/myatlas/BirdGrey1-hit-',
+                            2, 2,
                             [13, 16],
                             [2, 3])
 
         self.dkbad = Duck('bomb', 'bad', -300, 0, 2,  # pts, pts and rapidity
-                          'PNG/bomb_6.png',
-                          'PNG/bomb_dead.zip',
-                          'PNG/bomb_dead.zip')
+                          'atlas/myatlas/bomb 7',
+                          'atlas/myatlas/bomd_dead-',
+                          'atlas/myatlas/bomd_dead-',
+                          1, 6)
 
         self.dkcrasy = Duck('Bird', 'crasy', -300, 0, 2,
-                            'birds/BirdSkull2-idle.zip',
-                            'birds/BirdSkull2-hit.zip',
-                            'birds/BirdSkull2-hit.zip',
+                            'atlas/myatlas/BirdSkull2-idle-',
+                            'atlas/myatlas/BirdSkull2-hit-',
+                            'atlas/myatlas/BirdSkull2-hit-',
+                            2, 2,
                             [13, 16])
 
         self.dkhen = Hen(3, 'Bird', 'hen', 0, 0, 1,
-                         'birds/BirdHen-idle.zip',
-                         'targets/BirdHen-hit.zip',
-                         'targets/BirdHen-hit.zip')
+                         'atlas/myatlas/BirdHen-idle-',
+                         'atlas/myatlas/BirdHen-hit-',
+                         'atlas/myatlas/BirdHen-hit-',
+                         4, 2)
 
     def add_targets(self, duck, num):
         '''add the cibles take a duck parameter
@@ -353,19 +364,14 @@ class ShootGame(App):
             btn = TargetButton(
                     duck,
                     size_hint=(None, None),
-                    # source=self.assetpath + duck.hurtimg)
-                    # source=(duck.normalimg))
-                    # source=('atlas://' + self.assetpath + duck.normalimg))
-                    # source=(('atlas://' + atl)))
-                    source=('atlas://' + self.assetpath +
-                            'atlas/myatlas/BirdGreen-idle-0'))
+                    source=('atlas://' +
+                            self.assetpath +
+                            duck.normalimg + str(0)))
 
             if 'bomb' in btn.duck.targettype:
                 btn.anim_loop = 1
 
             self.shootscreen.add_widget(btn)
-            # btn.source = self.assetpath + duck.deadimg  # load all img
-            # btn.source = self.assetpath + duck.normalimg  # load all img
 
     def reset_buttons(self):
         '''reset all the buttons to their original position and their original
@@ -487,11 +493,11 @@ class ShootGame(App):
         # self.shootscreen.add_widget(ScoreLabel(text='', font_size='25sp'))
         self.shootscreen.add_widget(self.scorelabel)
         self.add_targets(self.dkeasy, 5)
-        # self.add_targets(self.dkmedium, 3)
-        # s elf.add_targets(self.dkhard, 1)
+        self.add_targets(self.dkmedium, 3)
+        self.add_targets(self.dkhard, 1)
         # self.add_targets(self.dkbad, 3)
-        # self.add_targets(self.dkbonus, 1)
-        # self.add_targets(self.dkcrasy, 1)
+        self.add_targets(self.dkbonus, 1)
+        self.add_targets(self.dkcrasy, 1)
         # self.add_targets(self.dkhen, 1)
 
         self.screen_m.current = 'menu'
@@ -509,12 +515,19 @@ class ShootGame(App):
         else:
             for btn in self.shootscreen.children:
                 if isinstance(btn, TargetButton):
-                    btn.source = ('atlas://' +
-                                  self.assetpath +
-                                  'atlas/myatlas/BirdGreen-idle-{}'.format(
-                                      btn.duck.index))
+                    if not btn.touched:
+                        btn.source = ('atlas://' +
+                                      shootgame.assetpath +
+                                      btn.duck.normalimg +
+                                      str(btn.duck.index))
+                    else:
+                        btn.source = ('atlas://' +
+                                      self.assetpath +
+                                      btn.duck.hurtimg +
+                                      str(btn.duck.index))
+                        print(btn.source)
 
-                    btn.duck.update_img()
+                    btn.update_img(btn)
 
     def on_start(self):
         '''Loop the keyboard input'''
