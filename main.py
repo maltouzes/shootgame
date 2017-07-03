@@ -421,7 +421,7 @@ class ShootGame(App):
                                 btn.dead_anim()
                         else:
                             btn.pos[0] += (btn.duck.rapidity *
-                                           self.diffic_mult())
+                                           self.diffic_mult)
 
                             if btn.duck.ducktype == 'medium':
                                 self.move_diagonal(btn)
@@ -454,7 +454,7 @@ class ShootGame(App):
         else:
             if btn.pos[0] < 0:
                 btn.pos[0] += (btn.duck.rapidity *
-                               self.diffic_mult())
+                               self.diffic_mult)
 
             btn.pos[0] += btn.velocity_x
             btn.pos[1] += btn.velocity_y
@@ -471,6 +471,7 @@ class ShootGame(App):
     def move_button_dead(self):
         pass
 
+    @property
     def diffic_mult(self):
         '''return the dificulty multiplier for move the buttons'''
         if self.dificulty == 'easy':
@@ -601,9 +602,9 @@ class ShootGame(App):
         self.mode = 'time'
 
     def reset_btn(self, btn, pos_x=10000, crasy=False):
-        '''reset the position,the image and the status of the button'''
-        btn.velocity_x = btn.duck.rapidity * self.diffic_mult()
-        btn.velocity_y = btn.duck.rapidity * self.diffic_mult()
+        '''reset the position,the source image and the status of the button'''
+        btn.velocity_x = btn.duck.rapidity * self.diffic_mult
+        btn.velocity_y = btn.duck.rapidity * self.diffic_mult
         btn.touched = False
         btn.killed = False
         btn.falling = False
@@ -616,8 +617,8 @@ class ShootGame(App):
                       'BirdGreen-idle-1')
 
         if btn.duck.ducktype == 'crasy':
-            a = (btn.duck.rapidity * self.diffic_mult())
-            b = (btn.duck.rapidity * - self.diffic_mult())
+            a = (btn.duck.rapidity * self.diffic_mult)
+            b = (btn.duck.rapidity * - self.diffic_mult)
             # btn.velocity_y = (random.choice([a, b]))
             btn.velocity_y = (random.uniform(a, b))
             btn.pos = (
