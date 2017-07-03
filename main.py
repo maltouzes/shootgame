@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.24'
+__version__ = '0.0.25'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -288,6 +288,9 @@ class ShootGame(App):
     timeadd = 1  # sec added
     lastshoot_type = None
     multshoot_type = 1
+    birdpause = ''
+    birdpauseindex = 0
+    birdpauseindexmax = 0
 
     def ducks_init(self):
         '''Initialize the cibles, with their
@@ -359,6 +362,31 @@ class ShootGame(App):
             #    btn.anim_loop = 1
 
             self.shootscreen.add_widget(btn)
+            if not self.birdpause:
+                self.birdpause = 'BirdYellow-idle-'
+                self.pausescreen.ids.birdgif.source = (
+                        self.assetpath + self.birdpause + '0')
+
+    def newimgpause(self):
+        btns = []
+        for btn in self.shootscreen.children:
+            if isinstance(btn, TargetButton):
+                btns.append(btn)
+
+        btn = random.choice(btns)
+        self.birdpause = btn.duck.normalimg
+        self.birdpauseindexmax = btn.duck.nbr_img
+        self.birdpauseindex = 0
+        # self.updateimgpause()
+
+    def updateimgpause(self, dt):
+        self.birdpauseindex += 1
+        if self.birdpauseindex >= self.birdpauseindexmax:
+            self.birdpauseindex = 0
+
+        self.pausescreen.ids.birdgif.source = (
+                self.assetpath +
+                self.birdpause + str(self.birdpauseindex))
 
     def reset_buttons(self):
         '''reset all the buttons to their original position and their original
@@ -463,9 +491,11 @@ class ShootGame(App):
         self.screen_m.transition.direction = 'left'
 
         self.shootscreen = ShootScreen(name='game')
+        self.pausescreen = PauseScreen(name='pause')
         self.screen_m.add_widget(StartScreen(name='menu'))
         self.screen_m.add_widget(LevelScreen(name='level'))
-        self.screen_m.add_widget(PauseScreen(name='pause'))
+        # self.screen_m.add_widget(PauseScreen(name='pause'))
+        self.screen_m.add_widget(self.pausescreen)
         self.screen_m.add_widget(WinScreen(name='win'))
         self.screen_m.add_widget(self.shootscreen)
 
@@ -486,6 +516,7 @@ class ShootGame(App):
         Clock.schedule_interval(self.move_buttons, 0.01)
         Clock.schedule_interval(self.reset_label, 0.01)
         Clock.schedule_interval(self.gif, 0.2)
+        Clock.schedule_interval(self.updateimgpause, 0.2)
         self.load_score()
 
         return self.screen_m
@@ -669,6 +700,7 @@ class ShootGame(App):
         '''hook the back key'''
         if key == 27 or key == 97 or key == 1001:
             if self.screen_m.current == 'game':
+                self.newimgpause()
                 self.screen_m.transition = FadeTransition()
                 self.screen_m.current = 'pause'
             elif self.screen_m.current == 'menu':

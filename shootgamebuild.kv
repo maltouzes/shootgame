@@ -96,7 +96,9 @@
         source: app.background1
 
     ImgButton:
-        source: app.assetpath + 'birds/BirdGreen.gif'
+        # source: app.assetpath + 'BirdGreen-idle-0'
+        id: birdgif
+        source: app.birdpause
         pos_hint: {'center_x': 0.5, 'center_y': 0.7}
         on_press: root.manager.current = 'game'
     Label:
