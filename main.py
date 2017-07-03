@@ -411,7 +411,9 @@ class ShootGame(App):
                 try:
                     if btn.duck.ducktype == 'crasy':
                         self.move_btn_crasy(btn)
-                    elif ('Bird' in btn.duck.targettype or
+                    if btn.duck.targettype == 'bomb':
+                        self.move_btn_vertically(btn)
+                    if ('Bird' in btn.duck.targettype or
                             'bomb' in btn.duck.targettype):
                         if btn.killed and not btn.falling:
                             btn.falling = True
@@ -432,6 +434,11 @@ class ShootGame(App):
                                 self.reset_btn(btn)
                 except AttributeError:
                     pass
+
+    def move_btn_vertically(self, btn):
+        btn.pos[1] -= (btn.duck.rapidity *
+                       self.diffic_mult())
+        print(btn.pos[1])
 
     def move_diagonal(self, btn):
         btn.pos[1] += btn.velocity_y
@@ -605,11 +612,6 @@ class ShootGame(App):
         btn.duck.timebeforespawn = \
             (btn.duck.timehere +
              random.randrange(btn.duck.timespawn[0], btn.duck.timespawn[1]))
-        btn.pos = (
-                random.uniform(
-                 -btn.texture.size[0], 0 - 600),
-                random.uniform(
-                 0+btn.texture.size[1], Window.size[1]-btn.texture.size[1]))
         btn.source = (self.assetpath +
                       'BirdGreen-idle-1')
 
@@ -623,6 +625,20 @@ class ShootGame(App):
                     random.uniform(
                         btn.texture.size[1],
                         Window.size[1] - btn.texture.size[1]))
+
+        elif btn.duck.targettype == 'bomb':
+            btn.pos = (
+                    random.uniform(
+                        -300, Window.size[0] - 100),
+                    random.uniform(
+                        Window.size[1], Window.size[1] + 600))
+        else:
+            btn.pos = (
+                    random.uniform(
+                     -btn.texture.size[0], 0 - 600),
+                    random.uniform(
+                     0+btn.texture.size[1],
+                     Window.size[1]-btn.texture.size[1]))
 
     def reset_label(self, dt):
         if self.screen_m.current != 'game':
