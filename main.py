@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.25'
+__version__ = '0.0.26'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -94,6 +94,18 @@ class Duck():
 class Hen(Duck):
     def __init__(self, eggs, *args, **kwargs):
         self.eggs = eggs
+        super().__init__(*args, **kwargs)
+
+
+class Gif():
+    def __init__(self, img='BirdYellow-idle-', imgindexmax=0):
+        self.img = img
+        self.imgindexmax = imgindexmax
+
+
+class GifButton(ButtonBehavior, Image, Gif):
+    def __init__(self, *args, **kwargs):
+        self.index = 0
         super().__init__(*args, **kwargs)
 
 
@@ -371,22 +383,37 @@ class ShootGame(App):
         btns = []
         for btn in self.shootscreen.children:
             if isinstance(btn, TargetButton):
-                btns.append(btn)
+                if 'bomb' in btn.duck.targettype:
+                    pass
+                else:
+                    btns.append(btn)
 
         btn = random.choice(btns)
-        self.birdpause = btn.duck.normalimg
-        self.birdpauseindexmax = btn.duck.nbr_img
-        self.birdpauseindex = 0
-        # self.updateimgpause()
+        # self.birdpause = btn.duck.normalimg
+        # self.birdpauseindexmax = btn.duck.nbr_img
+        # self.birdpauseindex = 0
+
+        btnid = self.pausescreen.ids.birdgif
+        btnid.img = btn.duck.normalimg
+        btnid.imgindexmax = btn.duck.nbr_img
+        btnid.index = 0
 
     def updateimgpause(self, dt):
-        self.birdpauseindex += 1
-        if self.birdpauseindex >= self.birdpauseindexmax:
-            self.birdpauseindex = 0
+        btn = self.pausescreen.ids.birdgif
 
-        self.pausescreen.ids.birdgif.source = (
+        btn.index += 1
+        # self.birdpauseindex += 1
+        # if self.birdpauseindex >= self.birdpauseindexmax:
+        #     self.birdpauseindex = 0
+        if btn.index >= btn.imgindexmax:
+            btn.index = 0
+
+        # self.pausescreen.ids.birdgif.source = (
+        #         self.assetpath +
+        #         self.birdpause + str(self.birdpauseindex))
+        btn.source = (
                 self.assetpath +
-                self.birdpause + str(self.birdpauseindex))
+                btn.img + str(btn.index))
 
     def reset_buttons(self):
         '''reset all the buttons to their original position and their original
