@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.26'
+__version__ = '0.0.27'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -164,10 +164,10 @@ class TargetButton(ButtonBehavior, Image):
 
     @staticmethod
     def mult_pts_type():
-        if shootgame.multshoot_type < 4:
+        if shootgame.multshoot_type < 6:
             return shootgame.multshoot_type
         else:
-            return 3
+            return 5
 
     def shoot_type(self, source):
         if self.source == shootgame.lastshoot_type:
@@ -275,8 +275,6 @@ class StartScreen(Screen):
 class ShootGame(App):
     '''all the logic of the game'''
     assetpath = 'atlas://atlas/birdsatlas/'
-    cibles = {'easy': 'DuckBrown_2.png', 'medium': 'DuckYellow_3.png',
-              'bad': 'DuckBad_3.png', 'gold': 'none'}
 
     background1 = assetpath + ("2")
     background2 = assetpath + ("1")
@@ -370,10 +368,6 @@ class ShootGame(App):
                             duck.normalimg + str(0)))
 
             self.shootscreen.add_widget(btn)
-            if not self.birdpause:
-                self.birdpause = 'BirdYellow-idle-'
-                self.pausescreen.ids.birdgif.source = (
-                        self.assetpath + self.birdpause + '0')
 
     def newimgpause(self):
         btns = []
@@ -451,8 +445,7 @@ class ShootGame(App):
 
     def move_btn_vertically(self, btn):
         btn.pos[1] -= (btn.duck.rapidity *
-                       self.diffic_mult())
-        print(btn.pos[1])
+                       self.diffic_mult)
 
     def move_diagonal(self, btn):
         btn.pos[1] += btn.velocity_y
