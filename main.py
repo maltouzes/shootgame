@@ -275,7 +275,6 @@ class StartScreen(Screen):
 class ShootGame(App):
     '''all the logic of the game'''
     assetpath = 'atlas://atlas/birdsatlas/'
-    # assetpath = os.getcwd() + ("/assets/")
     cibles = {'easy': 'DuckBrown_2.png', 'medium': 'DuckYellow_3.png',
               'bad': 'DuckBad_3.png', 'gold': 'none'}
 
@@ -370,9 +369,6 @@ class ShootGame(App):
                     source=(self.assetpath +
                             duck.normalimg + str(0)))
 
-            # if 'bomb' in btn.duck.targettype:
-            #    btn.anim_loop = 1
-
             self.shootscreen.add_widget(btn)
             if not self.birdpause:
                 self.birdpause = 'BirdYellow-idle-'
@@ -389,9 +385,6 @@ class ShootGame(App):
                     btns.append(btn)
 
         btn = random.choice(btns)
-        # self.birdpause = btn.duck.normalimg
-        # self.birdpauseindexmax = btn.duck.nbr_img
-        # self.birdpauseindex = 0
 
         btnid = self.pausescreen.ids.birdgif
         btnid.img = btn.duck.normalimg
@@ -402,15 +395,9 @@ class ShootGame(App):
         btn = self.pausescreen.ids.birdgif
 
         btn.index += 1
-        # self.birdpauseindex += 1
-        # if self.birdpauseindex >= self.birdpauseindexmax:
-        #     self.birdpauseindex = 0
         if btn.index >= btn.imgindexmax:
             btn.index = 0
 
-        # self.pausescreen.ids.birdgif.source = (
-        #         self.assetpath +
-        #         self.birdpause + str(self.birdpauseindex))
         btn.source = (
                 self.assetpath +
                 btn.img + str(btn.index))
@@ -529,14 +516,12 @@ class ShootGame(App):
         self.pausescreen = PauseScreen(name='pause')
         self.screen_m.add_widget(StartScreen(name='menu'))
         self.screen_m.add_widget(LevelScreen(name='level'))
-        # self.screen_m.add_widget(PauseScreen(name='pause'))
         self.screen_m.add_widget(self.pausescreen)
         self.screen_m.add_widget(WinScreen(name='win'))
         self.screen_m.add_widget(self.shootscreen)
 
         self.ducks_init()
 
-        # self.shootscreen.add_widget(ScoreLabel(text='', font_size='25sp'))
         self.shootscreen.add_widget(self.scorelabel)
         self.add_targets(self.dkbad, 3)
         self.add_targets(self.dkeasy, 5)
@@ -680,7 +665,6 @@ class ShootGame(App):
         else:  # self.pointsdisplay > self.points:
             self.pointsdisplay = self.points
 
-        # bt_crasy = None
         for btn in self.shootscreen.children:
             '''implement crasy duck clock'''
             if isinstance(btn, ScoreLabel) and btn.color[3] > 0:
@@ -693,11 +677,9 @@ class ShootGame(App):
         if self.screen_m.current != 'game':
             return
 
-        # bt_crasy = None
         for btn in self.shootscreen.children:
             '''implement crasy duck clock'''
             if isinstance(btn, TargetButton) and 'crasy' in btn.duck.ducktype:
-                # bt_crasy = btn
                 btn.duck.timebeforespawn -= 1
 
                 if btn.duck.timebeforespawn < 0:
@@ -706,9 +688,6 @@ class ShootGame(App):
                 btn.duck.timehere -= 1
                 if btn.duck.timehere < 0:
                     pass
-
-        # if bt_crasy.duck.timebeforespawn > 200:
-        # bt_crasy.duck.timebeforespawn = 12
 
         if self.screen_m.current != 'game' or self.mode != 'time':
             pass
