@@ -92,18 +92,21 @@ class Duck():
 
 
 class Hen(Duck):
+    '''Bonus when timer ending'''
     def __init__(self, eggs, *args, **kwargs):
         self.eggs = eggs
         super().__init__(*args, **kwargs)
 
 
 class Gif():
+    '''Implement gif behaviour for btn'''
     def __init__(self, img='BirdYellow-idle-', imgindexmax=0):
         self.img = img
         self.imgindexmax = imgindexmax
 
 
 class GifButton(ButtonBehavior, Image, Gif):
+    '''Just a gif btn'''
     def __init__(self, *args, **kwargs):
         self.index = 0
         super().__init__(*args, **kwargs)
@@ -156,6 +159,7 @@ class TargetButton(ButtonBehavior, Image):
             self.touched = True
 
     def combo(self):
+        '''Display combo on screen'''
         combo = shootgame.shootscreen.ids.combolabel
         if self.mult_pts_type() == 1:
             combo.text = ''
@@ -164,12 +168,15 @@ class TargetButton(ButtonBehavior, Image):
 
     @staticmethod  # maybe use property instead
     def mult_pts_type():
+        '''return the combo multiplicator according to multshoot_type'''
         if shootgame.multshoot_type < 6:
             return shootgame.multshoot_type
         else:
             return 5
 
     def shoot_type(self, source):
+        '''remember the lastshoot_type and increase multshoot_type
+        this is a part of all combo implementation'''
         if self.source == shootgame.lastshoot_type:
             shootgame.multshoot_type += 1
         else:
@@ -191,6 +198,8 @@ class TargetButton(ButtonBehavior, Image):
             shootgame.lstscorebeforeaddtime = shootgame.points - scoreremain
 
     def display_pts_win(self, pts):
+        '''when the user click on a target:
+            display the btn's points on the screen using ScoreLabel'''
         if pts < 0:
             try:
                 vibrator.vibrate(0.1)
@@ -209,6 +218,7 @@ class TargetButton(ButtonBehavior, Image):
                 w.color = (1, 1, 1, 1)
 
     def dead_anim(self):
+        '''anim when btn killed is True'''
         animation = Animation(pos=(
             self.pos[0] - self.size[0]/2, self.pos[1] + self.size[1]/2),
             t='linear',
@@ -227,6 +237,7 @@ class TargetButton(ButtonBehavior, Image):
 
 
 class ScoreLabel(Label):
+    '''Label used to display btn points on the screen'''
     timehere = 0
 
 
@@ -367,6 +378,7 @@ class ShootGame(App):
             self.shootscreen.add_widget(btn)
 
     def newimgpause(self):
+        '''random img btn when the game is in pause'''
         btns = []
         for btn in self.shootscreen.children:
             if isinstance(btn, TargetButton):
@@ -383,6 +395,7 @@ class ShootGame(App):
         btnid.index = 0
 
     def updateimgpause(self, dt):
+        '''update pause's GifButton'''
         btn = self.pausescreen.ids.birdgif
 
         btn.index += 1
@@ -442,16 +455,19 @@ class ShootGame(App):
                     pass
 
     def move_btn_vertically(self, btn):
+        '''move btn from top to bottom'''
         btn.pos[1] -= (btn.duck.rapidity *
                        self.diffic_mult)
 
     def move_diagonal(self, btn):
+        '''btn bounce again the edge of the screen'''
         btn.pos[1] += btn.velocity_y
 
         if (btn.top > Window.size[1] or btn.pos[1] < 0):
             btn.velocity_y *= -1
 
     def move_btn_crasy(self, btn):
+        '''DRY principe so should be remove: use move_diagonal instead'''
         # let btn use btn.dead_anim()
         if btn.killed:
             return
@@ -537,6 +553,7 @@ class ShootGame(App):
         return self.screen_m
 
     def gif(self, dt):
+        '''Clock for trigger update_img'''
         if self.screen_m.current != 'game':
             pass
         else:
@@ -545,6 +562,8 @@ class ShootGame(App):
                     self.update_img(btn)
 
     def update_img(self, btn):
+        '''update the gif on each btn:
+            increase the index and change the path accordingly'''
         nbr = 0
         btn.index += 1
         if btn.touched:
@@ -649,6 +668,7 @@ class ShootGame(App):
                      Window.size[1]-btn.texture.size[1]))
 
     def reset_label(self, dt):
+        '''fade out the btn's points displayed and smoothly add scores pts'''
         if self.screen_m.current != 'game':
             return
 
