@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.27'
+__version__ = '0.0.28'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -162,7 +162,7 @@ class TargetButton(ButtonBehavior, Image):
         else:
             combo.text = 'Combo X' + str(self.mult_pts_type())
 
-    @staticmethod
+    @staticmethod  # maybe use property instead
     def mult_pts_type():
         if shootgame.multshoot_type < 6:
             return shootgame.multshoot_type
@@ -297,9 +297,6 @@ class ShootGame(App):
     timeadd = 1  # sec added
     lastshoot_type = None
     multshoot_type = 1
-    birdpause = ''
-    birdpauseindex = 0
-    birdpauseindexmax = 0
 
     def ducks_init(self):
         '''Initialize the cibles, with their
@@ -417,29 +414,30 @@ class ShootGame(App):
         else:
             for btn in self.shootscreen.children:
                 try:
-                    if btn.duck.ducktype == 'crasy':
-                        self.move_btn_crasy(btn)
-                    if btn.duck.targettype == 'bomb':
-                        self.move_btn_vertically(btn)
                     if ('Bird' in btn.duck.targettype or
                             'bomb' in btn.duck.targettype):
                         if btn.killed and not btn.falling:
                             btn.falling = True
                             if 'bomb' not in btn.duck.targettype:
                                 btn.dead_anim()
-                        else:
-                            btn.pos[0] += (btn.duck.rapidity *
-                                           self.diffic_mult)
 
-                            if btn.duck.ducktype == 'medium':
-                                self.move_diagonal(btn)
+                    if btn.duck.ducktype == 'crasy':
+                        self.move_btn_crasy(btn)
+                    elif btn.duck.targettype == 'bomb':
+                        self.move_btn_vertically(btn)
+                    elif btn.duck.ducktype == 'medium':
+                        self.move_diagonal(btn)
 
-                        if ((btn.pos[0] > Window.size[0] + 490 or
-                            btn.pos[1] < 0 - btn.texture.size[1] or
-                                btn.pos[1] > (Window.size[1] +
-                                              btn.texture.size[1])) and 'crasy'
-                                not in btn.duck.ducktype):
-                                self.reset_btn(btn)
+                    else:
+                        btn.pos[0] += (btn.duck.rapidity *
+                                       self.diffic_mult)
+
+                    if ((btn.pos[0] > Window.size[0] + 490 or
+                        btn.pos[1] < 0 - btn.texture.size[1] or
+                            btn.pos[1] > (Window.size[1] +
+                                          btn.texture.size[1])) and 'crasy'
+                            not in btn.duck.ducktype):
+                            self.reset_btn(btn)
                 except AttributeError:
                     pass
 
@@ -454,19 +452,26 @@ class ShootGame(App):
             btn.velocity_y *= -1
 
     def move_btn_crasy(self, btn):
+        # let btn use btn.dead_anim()
+        if btn.killed:
+            return
+        # btn leave the screen
         if btn.duck.timehere < 0:
             btn.pos[0] += btn.velocity_x
             btn.pos[1] += btn.velocity_y
 
         else:
+            # btn still not in the screen so it must come
             if btn.pos[0] < 0:
                 btn.pos[0] += (btn.duck.rapidity *
                                self.diffic_mult)
 
+            # move the btn
             btn.pos[0] += btn.velocity_x
             btn.pos[1] += btn.velocity_y
             if btn.touched:
                 btn.killed = True
+            # btn bounce over the border
             if not btn.touched:
                 if btn.pos[0] < 0 or btn.pos[0] > (Window.size[0] -
                                                    btn.texture.size[0]/1.5):
@@ -474,9 +479,6 @@ class ShootGame(App):
                 if btn.pos[1] < 0 or btn.pos[1] > (Window.size[1] -
                                                    btn.texture.size[1]/1.5):
                     btn.velocity_y *= -1
-
-    def move_button_dead(self):
-        pass
 
     @property
     def diffic_mult(self):
