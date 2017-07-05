@@ -545,7 +545,7 @@ class ShootGame(App):
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtime_mode, 1)
         Clock.schedule_interval(self.move_buttons, 0.01)
-        Clock.schedule_interval(self.reset_label, 0.01)
+        Clock.schedule_interval(self._updt_game, 0.01)
         Clock.schedule_interval(self.gif, 0.2)
         Clock.schedule_interval(self.updateimgpause, 0.2)
         self.load_score()
@@ -667,10 +667,15 @@ class ShootGame(App):
                      0+btn.texture.size[1],
                      Window.size[1]-btn.texture.size[1]))
 
-    def reset_label(self, dt):
-        '''fade out the btn's points displayed and smoothly add scores pts'''
+    def _updt_game(self, dt):
+        '''call methods that need to be updated with a clock'''
         if self.screen_m.current != 'game':
             return
+        self.upte_label_pts()
+        self.fade_out_pts(dt)
+
+    def upte_label_pts(self):
+        '''fade out the btn's points displayed and smoothly add scores pts'''
 
         if self.pointsdisplay < self.points:
             if self.pointsdisplay + 100 < self.points:
@@ -680,6 +685,7 @@ class ShootGame(App):
         else:  # self.pointsdisplay > self.points:
             self.pointsdisplay = self.points
 
+    def fade_out_pts(self, dt):
         for btn in self.shootscreen.children:
             '''implement crasy duck clock'''
             if isinstance(btn, ScoreLabel) and btn.color[3] > 0:
