@@ -716,8 +716,10 @@ class ShootGame(App):
             pass
         else:
 
-            if self.timer < 5:
+            if self.timer < 6:
                 self.shootscreen.ids.timerlabel.color = (1, 0, 0, 1)
+            else:
+                self.shootscreen.ids.timerlabel.color = (0, 0, 0, 1)
             if self.timer > 0:
                 self.timer -= 1
             else:
