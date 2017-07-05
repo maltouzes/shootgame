@@ -462,6 +462,7 @@ class ShootGame(App):
     def move_diagonal(self, btn):
         '''btn bounce again the edge of the screen'''
         btn.pos[1] += btn.velocity_y
+        btn.pos[0] += (btn.duck.rapidity * self.diffic_mult)
 
         if (btn.top > Window.size[1] or btn.pos[1] < 0):
             btn.velocity_y *= -1
@@ -664,7 +665,8 @@ class ShootGame(App):
                     random.uniform(
                      -btn.texture.size[0], 0 - 600),
                     random.uniform(
-                     0+btn.texture.size[1],
+                     0,
+                     # 0+btn.texture.size[1],
                      Window.size[1]-btn.texture.size[1]))
 
     def _updt_game(self, dt):
