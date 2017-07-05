@@ -164,6 +164,7 @@ class TargetButton(ButtonBehavior, Image):
         if self.mult_pts_type() == 1:
             combo.text = ''
         else:
+            combo.color = (0, 0, 0, 1)
             combo.text = 'Combo X' + str(self.mult_pts_type())
 
     @staticmethod  # maybe use property instead
@@ -690,6 +691,10 @@ class ShootGame(App):
             self.pointsdisplay = self.points
 
     def fade_out_pts(self, dt):
+
+        combo = shootgame.shootscreen.ids.combolabel
+        if combo.color[3] > 0:
+            combo.color[3] -= dt/2
         for btn in self.shootscreen.children:
             '''implement crasy duck clock'''
             if isinstance(btn, ScoreLabel) and btn.color[3] > 0:
