@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.28'
+__version__ = '0.0.29'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -177,6 +177,7 @@ class TargetButton(ButtonBehavior, Image):
     def shoot_type(self, source):
         '''remember the lastshoot_type and increase multshoot_type
         this is a part of all combo implementation'''
+        shootgame.multshoot_time = 3
         if self.source == shootgame.lastshoot_type:
             shootgame.multshoot_type += 1
         else:
@@ -308,6 +309,7 @@ class ShootGame(App):
     timeadd = 1  # sec added
     lastshoot_type = None
     multshoot_type = 1
+    multshoot_time = 3
 
     def ducks_init(self):
         '''Initialize the cibles, with their
@@ -535,12 +537,12 @@ class ShootGame(App):
         self.ducks_init()
 
         self.shootscreen.add_widget(self.scorelabel)
-        self.add_targets(self.dkbad, 3)
         self.add_targets(self.dkeasy, 5)
         self.add_targets(self.dkmedium, 3)
         self.add_targets(self.dkhard, 1)
         self.add_targets(self.dkbonus, 1)
         self.add_targets(self.dkcrasy, 1)
+        self.add_targets(self.dkbad, 3)
         # self.add_targets(self.dkhen, 1)
 
         self.screen_m.current = 'menu'
@@ -699,6 +701,13 @@ class ShootGame(App):
         '''check if the timer is ended'''
         if self.screen_m.current != 'game':
             return
+
+        self.multshoot_time -= 1
+        if self.multshoot_time <= 0:
+            self.lastshoot_type = None
+
+            self.shootscreen.ids.combolabel.text = ''
+            self.multshoot_type = 1
 
         for btn in self.shootscreen.children:
             '''implement crasy duck clock'''
