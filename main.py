@@ -392,10 +392,10 @@ class ShootGame(App):
 
         btn = random.choice(btns)
 
-        btnid = self.pausescreen.ids.birdgif
-        btnid.img = btn.duck.normalimg
-        btnid.imgindexmax = btn.duck.nbr_img
-        btnid.index = 0
+        btnpause = self.pausescreen.ids.birdgif
+        btnpause.img = btn.duck.normalimg
+        btnpause.imgindexmax = btn.duck.nbr_img
+        btnpause.index = 0
 
     def updateimgpause(self, dt):
         '''update pause's GifButton'''
