@@ -692,16 +692,19 @@ class ShootGame(App):
             self.pointsdisplay = self.points
 
     def fade_out_pts(self, dt):
-
+        '''fade_out combo and points labels according to multshoot_time'''
         combo = shootgame.shootscreen.ids.combolabel
         if combo.color[3] > 0:
-            combo.color[3] -= dt/2
-        for btn in self.shootscreen.children:
+            combo.color[3] -= (dt/self.multshoot_time)
+        if combo.color[3] < 0:
+            combo.color[3] = 0
+
+        for lbl in self.shootscreen.children:
             '''implement crasy duck clock'''
-            if isinstance(btn, ScoreLabel) and btn.color[3] > 0:
-                btn.color[3] -= dt
-                if btn.color[3] < 0:
-                    btn.color[3] = 0
+            if isinstance(lbl, ScoreLabel) and lbl.color[3] > 0:
+                lbl.color[3] -= dt
+                if lbl.color[3] < 0:
+                    lbl.color[3] = 0
 
     def endtime_mode(self, dt):
         '''check if the timer is ended'''
