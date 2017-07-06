@@ -649,9 +649,12 @@ class ShootGame(App):
                       'BirdGreen-idle-1')
 
         if btn.duck.ducktype == 'crasy':
-            a = (btn.duck.rapidity * self.diffic_mult)
-            b = (btn.duck.rapidity * - self.diffic_mult)
-            btn.velocity_y = (random.uniform(a, b))
+            btn.velocity_y = random.uniform(
+                    (btn.duck.rapidity * self.diffic_mult),
+                    (btn.duck.rapidity * -self.diffic_mult))
+            # velocity_y can't be between -1 and 1 -> too slow
+            btn.velocity_y += abs(btn.velocity_y)/btn.velocity_y
+
             btn.pos = (
                     0 - pos_x,
                     random.uniform(
