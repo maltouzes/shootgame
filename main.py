@@ -466,7 +466,10 @@ class ShootGame(App):
         '''btn bounce again the edge of the screen'''
         btn.pos[1] += btn.velocity_y
         btn.pos[0] += (btn.duck.rapidity * self.diffic_mult)
+        self.bounce_top_bottom(btn)
 
+    def bounce_top_bottom(self, btn):
+        '''btn bounce again the top and the bottom of the screen'''
         if (btn.top > Window.size[1] or btn.pos[1] < 0):
             btn.velocity_y *= -1
 
@@ -496,9 +499,8 @@ class ShootGame(App):
                 if btn.pos[0] < 0 or btn.pos[0] > (Window.size[0] -
                                                    btn.texture.size[0]/1.5):
                     btn.velocity_x *= -1
-                if btn.pos[1] < 0 or btn.pos[1] > (Window.size[1] -
-                                                   btn.texture.size[1]/1.5):
-                    btn.velocity_y *= -1
+
+                self.bounce_top_bottom(btn)
 
     @property
     def diffic_mult(self):
@@ -649,7 +651,6 @@ class ShootGame(App):
         if btn.duck.ducktype == 'crasy':
             a = (btn.duck.rapidity * self.diffic_mult)
             b = (btn.duck.rapidity * - self.diffic_mult)
-            # btn.velocity_y = (random.choice([a, b]))
             btn.velocity_y = (random.uniform(a, b))
             btn.pos = (
                     0 - pos_x,
