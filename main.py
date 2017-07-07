@@ -480,7 +480,9 @@ class ShootGame(App):
             pass
         else:
             for btn in self.shootscreen.children:
-                try:
+                if (not self.end_anim and
+                        isinstance(btn, TargetButton) and
+                        btn.duck.ducktype != 'hen'):
                     if ('Bird' in btn.duck.targettype or
                             'bomb' in btn.duck.targettype):
                         if btn.killed and not btn.falling:
@@ -494,6 +496,8 @@ class ShootGame(App):
                         self.move_btn_vertically(btn)
                     elif btn.duck.ducktype == 'medium':
                         self.move_diagonal(btn)
+                    elif 'hen' in btn.duck.ducktype:
+                        pass
 
                     else:
                         btn.pos[0] += (btn.duck.rapidity *
@@ -505,8 +509,11 @@ class ShootGame(App):
                                           btn.texture.size[1])) and 'crasy'
                             not in btn.duck.ducktype):
                             self.reset_btn(btn)
-                except AttributeError:
-                    pass
+                else:
+                    if(isinstance(btn, TargetButton) and
+                            self.end_anim):
+                        btn.pos[0] += (btn.duck.rapidity * 6)
+                        btn.pos[1] -= (btn.duck.rapidity * 6)
 
     def move_btn_vertically(self, btn):
         '''move btn from top to bottom'''
