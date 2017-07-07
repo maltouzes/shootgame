@@ -360,6 +360,7 @@ class ShootGame(App):
     multshoot_type = 1
     multshoot_time = 3
     end_anim = False
+    henpos = None
 
     def ducks_init(self):
         '''Initialize the cibles, with their
@@ -415,6 +416,12 @@ class ShootGame(App):
                          'BirdHen-hit-',
                          'BirdHen-hit-',
                          4, 2)
+
+        self.dkegg = Duck('egg', 'egg', 10, 10, 1,
+                          'BirdHen-idle-',
+                          'BirdHen-hit-',
+                          'BirdHen-hit-',
+                          4, 2)
 
     def add_targets(self, duck, num):
         '''add the cibles take a duck parameter
@@ -496,7 +503,8 @@ class ShootGame(App):
                         self.move_btn_vertically(btn)
                     elif btn.duck.ducktype == 'medium':
                         self.move_diagonal(btn)
-                    elif 'hen' in btn.duck.ducktype:
+                    elif ('hen' in btn.duck.ducktype or
+                            'egg' in btn.duck.ducktype):
                         pass
 
                     else:
@@ -611,6 +619,7 @@ class ShootGame(App):
         self.add_targets(self.dkcrasy, 1)
         self.add_targets(self.dkbad, 3)
         self.add_targets(self.dkhen, 1)
+        self.add_targets(self.dkegg, 6)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtime_mode, 1)
@@ -618,6 +627,7 @@ class ShootGame(App):
         Clock.schedule_interval(self._updt_game, 0.01)
         Clock.schedule_interval(self.gif, 0.2)
         Clock.schedule_interval(self.updateimgpause, 0.2)
+        Clock.schedule_interval(self._updt_eggs, 0.5)
         self.load_score()
 
         return self.screen_m
@@ -813,9 +823,33 @@ class ShootGame(App):
                 self.timer -= 1
             else:
                 for btn in self.shootscreen.children:
-                    if(isinstance(btn, TargetButton) and
-                            btn.duck.ducktype == 'hen'):
-                        btn.hen_anim()
+                    if isinstance(btn, TargetButton):
+                        if btn.duck.ducktype == 'hen':
+                            btn.hen_anim()
+                        if btn.duck.ducktype == 'egg':
+                            self.move_egg(btn)
+
+    def move_egg(self, btn):
+        if not btn.falling:
+            btn.dead_anim()
+            btn.falling = True
+
+    def _updt_eggs(self, dt):
+        if (self.screen_m.current != 'game' or
+                not self.end_anim):
+            pass
+        else:
+            for btn in self.shootscreen.children:
+                if (isinstance(btn, TargetButton)):
+                    if btn.duck.ducktype == 'hen':
+                        self.henpos = btn.pos
+                    if (btn.duck.ducktype == 'egg' and
+                            btn.pos[1] < (0 - btn.texture.size[1])):
+                        try:
+                            btn.pos = self.henpos
+                            btn.dead_anim()
+                        except AttributeError:
+                            pass
 
     def finish(self):
         if self.points > self.bestscore:
