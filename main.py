@@ -260,6 +260,23 @@ class ShootScreen(Screen):
     pass
 
 
+class CreditsScreen(Screen):
+    def __init__(self, *args, **kwargs):
+        self.parse()
+        super().__init__(*args, **kwargs)
+
+    def parse(self):
+        try:
+            with open('CREDITS', 'r') as f:
+                self.txt = "\n" + f.read()
+                self.txt = self.txt.replace('*', '')
+        except FileNotFoundError:
+            self.txt = (
+                "\nCREDITS\n\n"
+                "Please visit:\n\n"
+                "https://github.com/maltouzes/shootgame/blob/master/CREDITS")
+
+
 class PauseScreen(Screen):
     '''when the game is in pause, see kv lang for gui'''
     pass
@@ -531,8 +548,10 @@ class ShootGame(App):
 
         self.shootscreen = ShootScreen(name='game')
         self.pausescreen = PauseScreen(name='pause')
+        self.creditsscreen = CreditsScreen(name='credits')
         self.screen_m.add_widget(StartScreen(name='menu'))
         self.screen_m.add_widget(LevelScreen(name='level'))
+        self.screen_m.add_widget(self.creditsscreen)
         self.screen_m.add_widget(self.pausescreen)
         self.screen_m.add_widget(WinScreen(name='win'))
         self.screen_m.add_widget(self.shootscreen)

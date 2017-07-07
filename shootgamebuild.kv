@@ -44,6 +44,19 @@
         text: "Exit"
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
 
+    ImgButton:
+        source: os.getcwd() + '/atlas/yellow_button07.png'
+        pos_hint: {'center_x': 0.1, 'center_y': 0.1}
+        on_press: root.manager.current = 'credits'
+
+    Label:
+        text: "?"
+        pos_hint: {'center_x': 0.1, 'center_y': 0.1}
+        bold: True
+        font_size: '30sp'
+
+
+
 <LevelScreen>:
     Image:
         allow_stretch: False
@@ -183,3 +196,24 @@
     Label:
         text: "Menu"
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+
+<CreditsScreen>
+    Image:
+        allow_stretch: False
+        keep_ratio: True
+        # size_hint_x: None
+        # size_hint_y: None
+        width: self.parent.width
+        height: self.parent.height
+        source: app.background1
+
+    ScrollView:
+        Label:
+            text: root.txt
+            font_size: '25sp'
+            halign: 'center'
+            bold: True
+            color: 0, 0, 0, 1
+            size_hint_y: None
+            text_size: self.width, None
+            height: self.texture_size[1]
