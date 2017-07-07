@@ -417,7 +417,7 @@ class ShootGame(App):
                          'BirdHen-hit-',
                          4, 2)
 
-        self.dkegg = Duck('egg', 'egg', 10, 10, 1,
+        self.dkegg = Duck('Bird', 'egg', 10, 10, 1,
                           'BirdHen-idle-',
                           'BirdHen-hit-',
                           'BirdHen-hit-',
@@ -839,17 +839,20 @@ class ShootGame(App):
                 not self.end_anim):
             pass
         else:
+            up = False
             for btn in self.shootscreen.children:
                 if (isinstance(btn, TargetButton)):
                     if btn.duck.ducktype == 'hen':
                         self.henpos = btn.pos
                     if (btn.duck.ducktype == 'egg' and
                             btn.pos[1] < (0 - btn.texture.size[1])):
-                        try:
-                            btn.pos = self.henpos
-                            btn.dead_anim()
-                        except AttributeError:
-                            pass
+                        if not up:
+                            try:
+                                btn.pos = self.henpos
+                                btn.dead_anim()
+                                up = True
+                            except AttributeError:
+                                pass
 
     def finish(self):
         if self.points > self.bestscore:
