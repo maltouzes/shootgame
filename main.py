@@ -231,7 +231,7 @@ class TargetButton(ButtonBehavior, Image):
                 t='linear',
                 duration=3)
 
-            for x in range(5):
+            for x in range(1):
                 self.animation += Animation(pos=(
                     random.uniform(win[0]/2, win[0] - self.size[0]),
                     random.uniform(win[1]/1.3, win[1]/8)),
@@ -514,6 +514,10 @@ class ShootGame(App):
                             self.end_anim):
                         btn.pos[0] += (btn.duck.rapidity * 6)
                         btn.pos[1] -= (btn.duck.rapidity * 6)
+
+                        if ('hen' in btn.duck.ducktype and
+                                btn.pos[1] < (0 - btn.texture.size[1])):
+                            self.finish()
 
     def move_btn_vertically(self, btn):
         '''move btn from top to bottom'''
@@ -813,14 +817,13 @@ class ShootGame(App):
                             btn.duck.ducktype == 'hen'):
                         btn.hen_anim()
 
-                        '''
-                if self.points > self.bestscore:
-                    self.bestscore = self.points
-                    self.newrecord = 'New Record !!!'
-                else:
-                    self.newrecord = ''
-                self.screen_m.current = 'win'
-                '''
+    def finish(self):
+        if self.points > self.bestscore:
+            self.bestscore = self.points
+            self.newrecord = 'New Record !!!'
+        else:
+            self.newrecord = ''
+        self.screen_m.current = 'win'
 
     def start(self):
         '''add the button to the screen and reset their position. reset the
