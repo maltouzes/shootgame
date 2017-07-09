@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.32'
+__version__ = '0.0.33'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -269,7 +269,8 @@ class CreditsScreen(Screen):
         try:
             with open('CREDITS', 'r') as f:
                 self.txt = "\n" + f.read()
-                self.txt = self.txt.replace('*', '')
+                import re
+                self.txt = re.sub(r'\*|http.*', '', self.txt)
         except FileNotFoundError:
             self.txt = (
                 "\nCREDITS\n\n"

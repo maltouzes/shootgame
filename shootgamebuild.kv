@@ -212,8 +212,12 @@
             text: root.txt
             font_size: '25sp'
             halign: 'center'
-            bold: True
+            # bold: True
+            markup: True
             color: 0, 0, 0, 1
             size_hint_y: None
             text_size: self.width, None
             height: self.texture_size[1]
+            on_ref_press:
+                import webbrowser
+                webbrowser.open(args[1])
