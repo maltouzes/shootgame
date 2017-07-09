@@ -24,6 +24,7 @@ ShootGame is a game
 """
 
 import os
+import operator
 import random
 # from customtransition import CustomTransition
 # from kivy.uix.screenmanager import AnimationTransition
@@ -231,7 +232,7 @@ class TargetButton(ButtonBehavior, Image):
                 t='linear',
                 duration=3)
 
-            for x in range(1):
+            for x in range(5):
                 self.animation += Animation(pos=(
                     random.uniform(win[0]/2, win[0] - self.size[0]),
                     random.uniform(win[1]/1.3, win[1]/8)),
@@ -249,20 +250,20 @@ class TargetButton(ButtonBehavior, Image):
     def hen_stop_anim(self):
         self.animation.stop(self)
 
-    def dead_anim(self):
+    def dead_anim(self, op=operator.sub):
         '''anim when btn killed is True'''
         animation = Animation(pos=(
-            self.pos[0] - self.size[0]/2, self.pos[1] + self.size[1]/2),
+            op(self.pos[0], self.size[0]/2), self.pos[1] + self.size[1]/2),
             t='linear',
             duration=.3)
 
         animation += Animation(pos=(
-            self.pos[0] - self.size[0]/1.8, self.pos[1] + self.size[1]/1.8),
+            op(self.pos[0], self.size[0]/1.8), self.pos[1] + self.size[1]/1.8),
             t='linear',
             duration=.1)
 
         animation += Animation(pos=(
-            self.pos[0] - self.size[0], - self.size[1]),
+            op(self.pos[0], self.size[0]), - self.size[1]),
             t='in_quad')
 
         animation.start(self)
@@ -831,7 +832,8 @@ class ShootGame(App):
 
     def move_egg(self, btn):
         if not btn.falling:
-            btn.dead_anim()
+            operators = [operator.sub, operator.add]
+            btn.dead_anim(random.choice(operators))
             btn.falling = True
 
     def _updt_eggs(self, dt):
@@ -849,7 +851,8 @@ class ShootGame(App):
                         if not up:
                             try:
                                 btn.pos = self.henpos
-                                btn.dead_anim()
+                                operators = [operator.sub, operator.add]
+                                btn.dead_anim(random.choice(operators))
                                 up = True
                             except AttributeError:
                                 pass
