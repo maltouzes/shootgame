@@ -268,6 +268,19 @@ class TargetButton(ButtonBehavior, Image):
 
         animation.start(self)
 
+    def coin_anim(self, op=operator.sub):
+        animation = Animation(pos=(
+            op(self.pos[0], self.size[0]), self.pos[1] + self.size[1]),
+            t='linear',
+            duration=.3)
+
+        animation += Animation(pos=(
+            random.uniform(-self.size[0], Window.size[0]), -self.size[1]),
+            t='in_quart',
+            duration=1)
+
+        animation.start(self)
+
 
 class ScoreLabel(Label):
     '''Label used to display btn points on the screen'''
@@ -419,9 +432,9 @@ class ShootGame(App):
                          4, 2)
 
         self.dkegg = Duck('Bird', 'egg', 10, 10, 1,
-                          'BirdHen-idle-',
-                          'BirdHen-hit-',
-                          'BirdHen-hit-',
+                          'coin-',
+                          'coin-',
+                          'coin-',
                           4, 2)
 
     def add_targets(self, duck, num):
@@ -852,7 +865,7 @@ class ShootGame(App):
                             try:
                                 btn.pos = self.henpos
                                 operators = [operator.sub, operator.add]
-                                btn.dead_anim(random.choice(operators))
+                                btn.coin_anim(random.choice(operators))
                                 up = True
                             except AttributeError:
                                 pass
