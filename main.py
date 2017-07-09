@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.34'
+__version__ = '0.0.35'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -358,10 +358,10 @@ class ShootGame(App):
                            'BirdPurple-hit-',
                            2, 2)
 
-        self.dkbonus = Duck('Bird', 'crasy', 1000, 0, 3,
-                            'BirdGrey1-idle-',
-                            'BirdGrey1-hit-',
-                            'BirdGrey1-hit-',
+        self.dkbonus = Duck('Bird', 'crasy', 800, 0, 3,
+                            'BirdRed-idle-',
+                            'BirdRed-hit-',
+                            'BirdRed-hit-',
                             2, 2,
                             [13, 16],
                             [2, 3])
