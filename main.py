@@ -135,7 +135,7 @@ class TargetButton(ButtonBehavior, Image):
         shootgame.shoot.play()
         ptsmulti = shootgame.dificultypts
         if self.touched is True and self.killed is not True:
-            self.source = (shootgame.assetpath +
+            self.source = (shootgame.ASSETPATH +
                            self.duck.deadimg + str(0))
 
             ptswin = self.duck.hurtpts * ptsmulti
@@ -149,7 +149,7 @@ class TargetButton(ButtonBehavior, Image):
             self.killed = True
 
         elif self.touched is False:
-            self.source = (shootgame.assetpath +
+            self.source = (shootgame.ASSETPATH +
                            self.duck.hurtimg + str(0))
             ptswin = self.duck.normalpts * ptsmulti
             shootgame.points += ptswin
@@ -287,11 +287,11 @@ class StartScreen(Screen):
 
 class ShootGame(App):
     '''all the logic of the game'''
-    assetpath = 'atlas://atlas/birdsatlas/'
+    ASSETPATH = 'atlas://atlas/birdsatlas/'
 
-    background1 = assetpath + ("2")
-    background2 = assetpath + ("1")
-    background3 = assetpath + ("4")
+    background1 = ASSETPATH + ("2")
+    background2 = ASSETPATH + ("1")
+    background3 = ASSETPATH + ("4")
 
     layout = FloatLayout(size_hint=(1, 1))
     points = NumericProperty(0)
@@ -375,7 +375,7 @@ class ShootGame(App):
             btn = TargetButton(
                     duck,
                     size_hint=(None, None),
-                    source=(self.assetpath +
+                    source=(self.ASSETPATH +
                             duck.normalimg + str(0)))
 
             self.shootscreen.add_widget(btn)
@@ -406,7 +406,7 @@ class ShootGame(App):
             btn.index = 0
 
         btn.source = (
-                self.assetpath +
+                self.ASSETPATH +
                 btn.img + str(btn.index))
 
     def reset_buttons(self):
@@ -584,11 +584,11 @@ class ShootGame(App):
             btn.index = 0
 
         if not btn.touched:
-            btn.source = (self.assetpath +
+            btn.source = (self.ASSETPATH +
                           btn.duck.normalimg +
                           str(btn.index))
         else:
-            btn.source = (self.assetpath +
+            btn.source = (self.ASSETPATH +
                           btn.duck.hurtimg +
                           str(btn.index))
 
@@ -645,7 +645,7 @@ class ShootGame(App):
         btn.duck.timebeforespawn = \
             (btn.duck.timehere +
              random.randrange(btn.duck.timespawn[0], btn.duck.timespawn[1]))
-        btn.source = (self.assetpath +
+        btn.source = (self.ASSETPATH +
                       'BirdGreen-idle-1')
 
         if btn.duck.ducktype == 'crasy':

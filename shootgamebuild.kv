@@ -14,7 +14,7 @@
         source: app.background1
 
     ImgButton:
-        source: app.assetpath + 'yellow_button00'
+        source: app.ASSETPATH + 'yellow_button00'
         pos_hint: {'center_x': 0.5, 'center_y': 0.8}
         # size_hint: 1.2, None
         on_press: root.manager.current = 'level'
@@ -26,7 +26,7 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.8}
 
     ImgButton:
-        source: app.assetpath + 'green_button00'
+        source: app.ASSETPATH + 'green_button00'
         pos_hint: {'center_x': 0.5, 'center_y': 0.6}
         on_press: root.manager.current = 'level'
         on_press: app.time_mode()
@@ -36,7 +36,7 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.6}
 
     ImgButton:
-        source: app.assetpath + 'red_button00'
+        source: app.ASSETPATH + 'red_button00'
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         on_press: app.leave()
         # size_hint: 1.2, None
@@ -55,7 +55,7 @@
         source: app.background1
 
     ImgButton:
-        source: app.assetpath + 'green_button00'
+        source: app.ASSETPATH + 'green_button00'
         pos_hint: {'center_x': 0.3, 'center_y': 0.7}
         on_press: root.manager.current = 'game'
         on_press: app.start_easy()
@@ -65,7 +65,7 @@
         pos_hint: {'center_x': 0.3, 'center_y': 0.7}
 
     ImgButton:
-        source: app.assetpath + 'yellow_button00'
+        source: app.ASSETPATH + 'yellow_button00'
         pos_hint: {'center_x': 0.7, 'center_y': 0.7}
         on_press: root.manager.current = 'game'
         on_press: app.start_medium()
@@ -75,7 +75,7 @@
         pos_hint: {'center_x': 0.7, 'center_y': 0.7}
 
     ImgButton:
-        source: app.assetpath + 'red_button00'
+        source: app.ASSETPATH + 'red_button00'
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         on_press: root.manager.current = 'game'
         on_press: app.start_hard()
@@ -105,7 +105,7 @@
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
 
     ImgButton:
-        source: app.assetpath + 'yellow_button00'
+        source: app.ASSETPATH + 'yellow_button00'
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         on_press: root.manager.current = 'menu'
         # size_hint: None, None
@@ -176,7 +176,7 @@
 
 
     ImgButton:
-        source: app.assetpath + 'yellow_button00'
+        source: app.ASSETPATH + 'yellow_button00'
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         on_press: root.manager.current = 'menu'
         size_hint: None, None
