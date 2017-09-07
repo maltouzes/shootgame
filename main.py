@@ -135,6 +135,7 @@ class TargetButton(ButtonBehavior, Image):
         '''check which duck is touched or not'''
         if isinstance(self.duck, Hen):
             self.duck.eggs -= 1
+
         shootgame.shoot.play()
         ptsmulti = shootgame.dificultypts
         if self.touched is True and self.killed is not True:
@@ -362,8 +363,9 @@ class ShootGame(App):
     dificulty = 'none'  # easy, medium and hard
     dificultypts = 1
     mode = 'none'  # arcade, time
-    shoot = SoundLoader.load(os.getcwd() + '/sound/shotgun.wav')
+    # shoot = SoundLoader.load(os.getcwd() + '/sound/shotgun.wav')
     soundbtn = SoundLoader.load(os.getcwd() + '/sound/push.ogg')
+    shoot = soundbtn
     timer = NumericProperty(0)
     pointsdisplay = NumericProperty(0)
     scorelabel = ScoreLabel(text='', font_size='25sp')
@@ -774,6 +776,15 @@ class ShootGame(App):
 
         self.upte_label_pts()
         self.fade_out_pts(dt)
+        self.updt_coin()
+
+    def updt_coin(self):
+        for btn in self.shootscreen.children:
+            if (isinstance(btn, TargetButton) and
+                    'egg' in btn.duck.ducktype and
+                    btn.touched and
+                    btn.color[3] > 0):
+                btn.color[3] -= 0.1
 
     def upte_label_pts(self):
         '''fade out the btn's points displayed and smoothly add scores pts'''
@@ -863,6 +874,8 @@ class ShootGame(App):
                             btn.pos[1] < (0 - btn.texture.size[1])):
                         if not up:
                             try:
+                                btn.touched = False
+                                btn.color[3] = 1
                                 btn.pos = self.henpos
                                 operators = [operator.sub, operator.add]
                                 btn.coin_anim(random.choice(operators))
