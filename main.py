@@ -433,7 +433,7 @@ class ShootGame(App):
                          'BirdHen-hit-',
                          4, 2)
 
-        self.dkegg = Duck('Bird', 'egg', 10, 10, 1,
+        self.dkegg = Duck('Bird', 'egg', 50, 0, 1,
                           'coin-',
                           'coin-',
                           'coin-',
@@ -773,6 +773,9 @@ class ShootGame(App):
 
         if self.timer > MAX_TIMER:
             self.timer = MAX_TIMER
+
+        if self.timer <= 0:  # hide timer
+            self.shootscreen.ids.timerlabel.color = (0, 0, 0, 0)
 
         self.upte_label_pts()
         self.fade_out_pts(dt)
