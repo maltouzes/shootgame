@@ -54,6 +54,7 @@ except ImportError:
     pass
 
 Window.size = (800, 460)
+MAX_TIMER = 25
 
 
 class ImgButton(ButtonBehavior, Image):
@@ -700,6 +701,10 @@ class ShootGame(App):
         '''call methods that need to be updated with a clock'''
         if self.screen_m.current != 'game':
             return
+
+        if self.timer > MAX_TIMER:
+            self.timer = MAX_TIMER
+
         self.upte_label_pts()
         self.fade_out_pts(dt)
 
