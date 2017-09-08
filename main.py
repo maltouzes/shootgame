@@ -135,6 +135,9 @@ class TargetButton(ButtonBehavior, Image):
         '''check which duck is touched or not'''
         if isinstance(self.duck, Hen):
             self.duck.eggs -= 1
+        if (self.duck.ducktype == 'bad' and
+                shootgame.end_anim):
+            shootgame.finish()
 
         shootgame.shoot.play()
         ptsmulti = shootgame.dificultypts
@@ -233,18 +236,18 @@ class TargetButton(ButtonBehavior, Image):
                 t='linear',
                 duration=3)
 
-            for x in range(5):
+            for x in range(2):
                 self.animation += Animation(pos=(
                     random.uniform(win[0]/2, win[0] - self.size[0]),
                     random.uniform(win[1]/1.3, win[1]/8)),
                     t='linear',
-                    duration=1)
+                    duration=3)
 
                 self.animation += Animation(pos=(
                     random.uniform(0 + self.size[0], win[0]/2),
                     random.uniform(win[1]/1.3, win[1]/8)),
                     t='linear',
-                    duration=1)
+                    duration=3)
 
             self.animation.start(self)
 
