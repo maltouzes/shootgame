@@ -944,8 +944,9 @@ class ShootGame(App):
 
     def save_score(self):
         '''save the score to a file'''
-        with open('scores', 'w') as f:
-            f.write(str(self.bestscore))
+        if 'time' in shootgame.mode:
+            with open('scores', 'w') as f:
+                f.write(str(self.bestscore))
 
     def load_score(self):
         '''load a score from a file'''
