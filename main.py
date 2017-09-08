@@ -865,21 +865,23 @@ class ShootGame(App):
                 not self.end_anim):
             pass
         else:
-            up = False
+            lista = []
             for btn in self.shootscreen.children:
                 if (isinstance(btn, TargetButton)):
                     if btn.duck.ducktype == 'hen':
                         self.henpos = btn.pos
-                    if (btn.duck.ducktype == 'egg' and
-                            btn.pos[1] < (0 - btn.texture.size[1])):
-                        if not up:
+                    if (((btn.duck.ducktype == 'egg') or
+                        (btn.duck.ducktype == 'bad')) and
+                            (btn.pos[1] < (0 - btn.texture.size[1])) and
+                            (btn.duck.ducktype not in lista) and
+                            self.henpos):
                             try:
+                                lista.append(btn.duck.ducktype)
                                 btn.touched = False
                                 btn.color[3] = 1
                                 btn.pos = self.henpos
                                 operators = [operator.sub, operator.add]
                                 btn.coin_anim(random.choice(operators))
-                                up = True
                             except AttributeError:
                                 pass
 
