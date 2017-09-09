@@ -54,7 +54,7 @@ try:
 except ImportError:
     pass
 
-Window.size = (800, 460)
+# Window.size = (800, 460)
 MAX_TIMER = 25
 
 
@@ -231,23 +231,22 @@ class TargetButton(ButtonBehavior, Image):
             shootgame.end_anim = True
             win = Window.size
 
-            self.animation = Animation(pos=(
-                win[0]/2, win[1]/2),
-                t='linear',
-                duration=3)
+            pos = (win[0]/2-self.size[0]/2, win[1]/2)
+            self.animation = Animation(
+                    pos=pos,
+                    t='linear',
+                    duration=3)
 
             for x in range(2):
-                self.animation += Animation(pos=(
-                    random.uniform(win[0]/2, win[0] - self.size[0]),
-                    random.uniform(win[1]/1.3, win[1]/8)),
-                    t='linear',
-                    duration=3)
+                self.animation += Animation(
+                        pos=(pos),
+                        t='linear',
+                        duration=2)
 
-                self.animation += Animation(pos=(
-                    random.uniform(0 + self.size[0], win[0]/2),
-                    random.uniform(win[1]/1.3, win[1]/8)),
-                    t='linear',
-                    duration=3)
+                self.animation += Animation(
+                        pos=pos,
+                        t='linear',
+                        duration=3)
 
             self.animation.start(self)
 
@@ -273,15 +272,25 @@ class TargetButton(ButtonBehavior, Image):
         animation.start(self)
 
     def coin_anim(self, op=operator.sub):
+        pos_x = random.uniform(0, self.size[0]*3)
+
         animation = Animation(pos=(
-            op(self.pos[0], self.size[0]), self.pos[1] + self.size[1]),
+            op(self.pos[0], pos_x),
+            self.pos[1] + self.size[1]),
             t='linear',
-            duration=.3)
+            duration=0.8)
 
         animation += Animation(pos=(
-            random.uniform(-self.size[0], Window.size[0]), -self.size[1]),
-            t='in_quart',
-            duration=1)
+            op(self.pos[0], random.uniform(pos_x, pos_x*1.2)),
+            self.pos[1]),
+            t='linear',
+            duration=0.8)
+
+        animation += Animation(pos=(
+            op(self.pos[0], random.uniform(pos_x, pos_x*1.2)),
+            -self.size[1]),
+            t='in_quad',
+            duration=0.8)
 
         animation.start(self)
 
@@ -553,6 +562,8 @@ class ShootGame(App):
 
     def move_diagonal(self, btn):
         '''btn bounce again the edge of the screen'''
+        if self.end_anim:
+            return
         btn.pos[1] += btn.velocity_y
         btn.pos[0] += (btn.duck.rapidity * self.diffic_mult)
         self.bounce_top_bottom(btn)
@@ -565,7 +576,7 @@ class ShootGame(App):
     def move_btn_crasy(self, btn):
         '''DRY principe so should be remove: use move_diagonal instead'''
         # let btn use btn.dead_anim()
-        if btn.killed:
+        if btn.killed or self.end_anim:
             return
         # btn leave the screen
         if btn.duck.timehere < 0:
@@ -722,7 +733,7 @@ class ShootGame(App):
         self.screen_m.transition = SlideTransition()
         self.screen_m.transition.direction = 'left'
         self.shootscreen.ids.timerlabel.text = 'Time ' + str(self.timer)
-        self.timer = 2
+        self.timer = 15  # default is 15
         self.shootscreen.ids.timerlabel.color = (0, 0, 0, 1)
         self.mode = 'time'
 
@@ -790,7 +801,7 @@ class ShootGame(App):
                     'egg' in btn.duck.ducktype and
                     btn.touched and
                     btn.color[3] > 0):
-                btn.color[3] -= 0.1
+                btn.color[3] -= 0.25
 
     def upte_label_pts(self):
         '''fade out the btn's points displayed and smoothly add scores pts'''
