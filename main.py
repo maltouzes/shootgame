@@ -389,6 +389,7 @@ class ShootGame(App):
     multshoot_time = 3
     end_anim = False
     henpos = None
+    hen_stopped = False
 
     def ducks_init(self):
         '''Initialize the cibles, with their
@@ -496,6 +497,7 @@ class ShootGame(App):
     def reset_buttons(self):
         '''reset all the buttons to their original position and their original
         image'''
+        self.hen_stopped = False
         for btn in self.shootscreen.children:
             if isinstance(btn, TargetButton):  # and
                 # 'crasy' not in btn.duck.ducktype):
@@ -554,6 +556,9 @@ class ShootGame(App):
                         if ('hen' in btn.duck.ducktype and
                                 btn.pos[1] < (0 - btn.texture.size[1])):
                             self.finish()
+                        if ('hen' in btn.duck.ducktype and
+                                btn.pos[0] > Window.size[0]/2 - btn.size[0]):
+                            self.hen_stopped = True
 
     def move_btn_vertically(self, btn):
         '''move btn from top to bottom'''
@@ -771,6 +776,13 @@ class ShootGame(App):
                         -300, Window.size[0] - 100),
                     random.uniform(
                         Window.size[1], Window.size[1] + 600))
+        elif btn.duck.ducktype == 'hen':
+            btn.pos = (
+                    -500,
+                    random.uniform(
+                     0,
+                     # 0+btn.texture.size[1],
+                     Window.size[1]-btn.texture.size[1]))
         else:
             btn.pos = (
                     random.uniform(
@@ -843,7 +855,9 @@ class ShootGame(App):
 
         for btn in self.shootscreen.children:
             '''implement crasy duck clock'''
-            if isinstance(btn, TargetButton) and 'crasy' in btn.duck.ducktype:
+            if (isinstance(btn, TargetButton) and
+                    'crasy' in btn.duck.ducktype
+                    and not self.end_anim):
                 btn.duck.timebeforespawn -= 1
 
                 if btn.duck.timebeforespawn < 0:
@@ -885,6 +899,8 @@ class ShootGame(App):
             lista = []
             for btn in self.shootscreen.children:
                 if (isinstance(btn, TargetButton)):
+                    if not self.hen_stopped:
+                        return
                     if btn.duck.ducktype == 'hen':
                         self.henpos = btn.pos
                     if (((btn.duck.ducktype == 'egg') or
