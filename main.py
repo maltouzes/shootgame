@@ -343,6 +343,10 @@ class PauseScreen(Screen):
     pass
 
 
+class ScoresScreen(Screen):
+    pass
+
+
 class WinScreen(Screen):
     '''when the user finish the time mode, see kv lang for gui'''
     pass
@@ -640,9 +644,11 @@ class ShootGame(App):
         self.shootscreen = ShootScreen(name='game')
         self.pausescreen = PauseScreen(name='pause')
         self.creditsscreen = CreditsScreen(name='credits')
+        self.scoresscreen = ScoresScreen(name='scores')
         self.screen_m.add_widget(StartScreen(name='menu'))
         self.screen_m.add_widget(LevelScreen(name='level'))
         self.screen_m.add_widget(self.creditsscreen)
+        self.screen_m.add_widget(self.scoresscreen)
         self.screen_m.add_widget(self.pausescreen)
         self.screen_m.add_widget(WinScreen(name='win'))
         self.screen_m.add_widget(self.shootscreen)

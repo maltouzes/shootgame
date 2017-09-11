@@ -55,6 +55,17 @@
         bold: True
         font_size: '30sp'
 
+    ImgButton:
+        source: app.ASSETPATH + 'yellow_button01'
+        pos_hint: {'center_x': 0.9, 'center_y': 0.1}
+        on_press: root.manager.current = 'scores'
+
+    Label:
+        text: "Score"
+        pos_hint: {'center_x': 0.9, 'center_y': 0.1}
+        bold: True
+        font_size: '30sp'
+
 
 
 <LevelScreen>:
@@ -221,3 +232,28 @@
             on_ref_press:
                 import webbrowser
                 webbrowser.open(args[1])
+
+<ScoresScreen>
+    Image:
+        allow_stretch: False
+        keep_ratio: True
+        # size_hint_x: None
+        # size_hint_y: None
+        width: self.parent.width
+        height: self.parent.height
+        source: app.background1
+
+    Label:
+        text: 'Easy ' + str(app.bestscore['easy'])
+        pos_hint: {'center_x': 0.5, 'center_y': 0.8}
+    Image:
+        source: app.ASSETPATH + 'yellow_button00'
+        pos_hint: {'center_x': 0.5, 'center_y': 0.8}
+        # size_hint: 1.2, None
+
+    Label:
+        text: 'Medium ' + str(app.bestscore['medium'])
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    Label:
+        text: 'hard ' + str(app.bestscore['hard'])
+        pos_hint: {'center_x': 0.5, 'center_y': 0.2}
