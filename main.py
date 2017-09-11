@@ -26,12 +26,14 @@ ShootGame is a game
 import os
 import operator
 import random
+import csv
 # from customtransition import CustomTransition
 # from kivy.uix.screenmanager import AnimationTransition
 # from datetime import datetime
 # from kivy.utils import platform
 from kivy.uix.label import Label
 from kivy.properties import NumericProperty
+from kivy.properties import DictProperty
 from kivy.properties import StringProperty
 from kivy.app import App
 from kivy.clock import Clock
@@ -370,7 +372,7 @@ class ShootGame(App):
 
     layout = FloatLayout(size_hint=(1, 1))
     points = NumericProperty(0)
-    bestscore = NumericProperty()
+    bestscore = DictProperty({'easy': 0, 'medium': 0, 'hard': 0})
     newrecord = StringProperty('')
     dificulty = 'none'  # easy, medium and hard
     dificultypts = 1
@@ -918,9 +920,17 @@ class ShootGame(App):
                             except AttributeError:
                                 pass
 
+    def new_score(self):
+        if 'none' in self.dificulty:
+            return False
+        if self.points > int(self.bestscore[self.dificulty]):
+            self.bestscore[self.dificulty] = self.points
+            return True
+        else:
+            return False
+
     def finish(self):
-        if self.points > self.bestscore:
-            self.bestscore = self.points
+        if self.new_score():
             self.newrecord = 'New Record !!!'
         else:
             self.newrecord = ''
@@ -945,6 +955,7 @@ class ShootGame(App):
         '''hook the back key'''
         if key == 27 or key == 97 or key == 1001:
             if self.screen_m.current == 'game':
+                self.new_score()
                 self.newimgpause()
                 self.screen_m.transition = FadeTransition()
                 self.screen_m.current = 'pause'
@@ -961,11 +972,13 @@ class ShootGame(App):
 
     def on_pause(self):
         '''Enable pause on Android'''
+        self.new_score()  # check this
         self.save_score()
         return True
 
     def on_stop(self):
         '''save score when the app stop'''
+        self.new_score()  # check this
         self.save_score()
 
     def on_resume(self):
@@ -974,16 +987,23 @@ class ShootGame(App):
 
     def save_score(self):
         '''save the score to a file'''
-        if 'time' in shootgame.mode:
-            with open('scores', 'w') as f:
-                f.write(str(self.bestscore))
+        if 'time' in shootgame.mode and self.dificulty != 'none':
+            with open('scores.csv', 'w') as csvfile:
+                fieldnames = ['dificulty', 'score']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                for key, value in self.bestscore.items():
+                    writer.writerow({'dificulty': key,
+                                     'score': value})
 
     def load_score(self):
         '''load a score from a file'''
-        if os.path.isfile('scores'):
+        if os.path.isfile('scores.csv'):
             try:
-                with open('scores', 'r') as f:
-                    self.bestscore = float(f.readline())
+                with open('scores.csv') as csvfile:
+                    reader = csv.DictReader(csvfile)
+                    for row in reader:
+                        self.bestscore[row['dificulty']] = row['score']
             except ValueError:
                 self.bestscore = 0
 
