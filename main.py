@@ -277,13 +277,13 @@ class TargetButton(ButtonBehavior, Image):
         pos_x = random.uniform(0, self.size[0]*3)
 
         animation = Animation(pos=(
-            op(self.pos[0], pos_x),
+            op(self.pos[0], pos_x*1.2),
             self.pos[1] + self.size[1]),
             t='linear',
             duration=0.8)
 
         animation += Animation(pos=(
-            op(self.pos[0], random.uniform(pos_x, pos_x*1.2)),
+            op(self.pos[0], random.uniform(pos_x*1.2, pos_x*1.4)),
             self.pos[1]),
             t='linear',
             duration=0.8)
