@@ -671,6 +671,7 @@ class ShootGame(App):
         Clock.schedule_interval(self._updt_game, 0.01)
         Clock.schedule_interval(self.gif, 0.2)
         Clock.schedule_interval(self.updateimgpause, 0.2)
+        Clock.schedule_interval(self.updateimgscores, 0.2)
         Clock.schedule_interval(self._updt_eggs, 0.5)
         self.load_score()
 
@@ -1017,29 +1018,72 @@ class ShootGame(App):
 
     def load_score_img(self):
         for difficulty in self.bestscore:
-            print(difficulty)
-            print(self.bestscore[difficulty])
             score = int(self.bestscore[difficulty])
-            if score >= 100 and score < 200:
-                img = 'BirdGreen-idle-0'
 
+            if score >= 100 and score < 200:
+                img = 'BirdGreen-idle-'
+                imgindexmax = 2
+                txt = 'Novice'
             elif score >= 200 and score < 300:
-                img = 'BirdYellow-idle-0'
+                img = 'BirdYellow-idle-'
+                imgindexmax = 8
+                txt = 'Sophomore'
             elif score >= 300 and score < 400:
-                img = 'BirdPurple-idle-0'
+                img = 'BirdPurple-idle-'
+                imgindexmax = 2
+                txt = 'Intermediate'
             elif score >= 400 and score < 600:
-                img = 'BirdRed-idle-0'
+                img = 'BirdRed-idle-'
+                imgindexmax = 2
+                txt = 'Advanced'
             elif score >= 600:
-                img = 'BirdHen-idle-0'
+                img = 'BirdHen-idle-'
+                imgindexmax = 4
+                txt = 'Expert'
             else:
-                img = 'BirdGreen-idle-0'
+                img = 'BirdGreen-idle-'
+                imgindexmax = 2
+                txt = 'Newbie'
 
             if difficulty == 'easy':
-                self.scoresscreen.ids.bonus1.source = self.ASSETPATH + img
+                self.scoresscreen.ids.bonus1.img = img
+                self.scoresscreen.ids.textbonus1.text = txt
+                self.scoresscreen.ids.bonus1.imgindexmax = imgindexmax
+
+                self.scoresscreen.ids.bonus1.source = (self.ASSETPATH +
+                                                       img + str(0))
             elif difficulty == 'medium':
-                self.scoresscreen.ids.bonus2.source = self.ASSETPATH + img
+                self.scoresscreen.ids.bonus2.img = img
+                self.scoresscreen.ids.textbonus2.text = txt
+                self.scoresscreen.ids.bonus2.imgindexmax = imgindexmax
+
+                self.scoresscreen.ids.bonus2.source = (self.ASSETPATH +
+                                                       img + str(0))
             elif difficulty == 'hard':
-                self.scoresscreen.ids.bonus3.source = self.ASSETPATH + img
+                self.scoresscreen.ids.bonus3.img = img
+                self.scoresscreen.ids.textbonus3.text = txt
+                self.scoresscreen.ids.bonus3.imgindexmax = imgindexmax
+
+                self.scoresscreen.ids.bonus3.source = (self.ASSETPATH +
+                                                       img + str(0))
+
+    def updateimgscores(self, dt):
+        '''update pause's GifButton'''
+        btn = self.scoresscreen.ids.bonus1
+        self.updateimgscoresindex(btn)
+        btn = self.scoresscreen.ids.bonus2
+        self.updateimgscoresindex(btn)
+        btn = self.scoresscreen.ids.bonus3
+        self.updateimgscoresindex(btn)
+
+    def updateimgscoresindex(self, btn):
+        btn.index += 1
+        if btn.index >= btn.imgindexmax:
+            btn.index = 0
+
+        btn.source = (
+                self.ASSETPATH +
+                btn.img + str(btn.index))
 
 
 if __name__ == '__main__':

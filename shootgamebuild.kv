@@ -248,28 +248,49 @@
         pos_hint: {'center_x': 0.3, 'center_y': 0.8}
         bold: True
         font_size: '30sp'
-    Image:
+    GifButton:
         id: bonus1
         source: app.ASSETPATH + "BirdGreen-idle-1"
-        pos_hint: {'center_x': 0.7, 'center_y': 0.8}
+        pos_hint: {'center_x': 0.6, 'center_y': 0.8}
+    Label:
+        id: textbonus1
+        text: 'Beginner'
+        pos_hint: {'center_x': 0.8, 'center_y': 0.8}
+        bold: True
+        font_size: '30sp'
+
     Label:
         text: 'Medium ' + str(app.bestscore['medium'])
         pos_hint: {'center_x': 0.3, 'center_y': 0.6}
         bold: True
         font_size: '30sp'
-    Image:
+    GifButton:
         id: bonus2
         source: app.ASSETPATH + "BirdGreen-idle-1"
-        pos_hint: {'center_x': 0.7, 'center_y': 0.6}
+        pos_hint: {'center_x': 0.6, 'center_y': 0.6}
     Label:
-        text: 'hard ' + str(app.bestscore['hard'])
+        id: textbonus2
+        text: 'Beginner'
+        pos_hint: {'center_x': 0.8, 'center_y': 0.6}
+        bold: True
+        font_size: '30sp'
+
+    Label:
+        text: 'Hard ' + str(app.bestscore['hard'])
         pos_hint: {'center_x': 0.3, 'center_y': 0.4}
         bold: True
         font_size: '30sp'
-    Image:
+    GifButton:
         id: bonus3
         source: app.ASSETPATH + "BirdGreen-idle-1"
-        pos_hint: {'center_x': 0.7, 'center_y': 0.4}
+        pos_hint: {'center_x': 0.6, 'center_y': 0.4}
+    Label:
+        id: textbonus3
+        text: 'Beginner'
+        pos_hint: {'center_x': 0.8, 'center_y': 0.4}
+        bold: True
+        font_size: '30sp'
+
 
     ImgButton:
         source: app.ASSETPATH + 'yellow_button00'
