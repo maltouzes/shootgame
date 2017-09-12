@@ -245,15 +245,38 @@
 
     Label:
         text: 'Easy ' + str(app.bestscore['easy'])
-        pos_hint: {'center_x': 0.5, 'center_y': 0.8}
+        pos_hint: {'center_x': 0.3, 'center_y': 0.8}
+        bold: True
+        font_size: '30sp'
     Image:
-        source: app.ASSETPATH + 'yellow_button00'
-        pos_hint: {'center_x': 0.5, 'center_y': 0.8}
-        # size_hint: 1.2, None
-
+        id: bonus1
+        source: app.ASSETPATH + "BirdGreen-idle-1"
+        pos_hint: {'center_x': 0.7, 'center_y': 0.8}
     Label:
         text: 'Medium ' + str(app.bestscore['medium'])
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        pos_hint: {'center_x': 0.3, 'center_y': 0.6}
+        bold: True
+        font_size: '30sp'
+    Image:
+        id: bonus2
+        source: app.ASSETPATH + "BirdGreen-idle-1"
+        pos_hint: {'center_x': 0.7, 'center_y': 0.6}
     Label:
         text: 'hard ' + str(app.bestscore['hard'])
+        pos_hint: {'center_x': 0.3, 'center_y': 0.4}
+        bold: True
+        font_size: '30sp'
+    Image:
+        id: bonus3
+        source: app.ASSETPATH + "BirdGreen-idle-1"
+        pos_hint: {'center_x': 0.7, 'center_y': 0.4}
+
+    ImgButton:
+        source: app.ASSETPATH + 'yellow_button00'
+        pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+        on_press: root.manager.current = 'menu'
+        # size_hint: None, None
+        size_hint: 1.2, None
+    Label:
+        text: "Menu"
         pos_hint: {'center_x': 0.5, 'center_y': 0.2}

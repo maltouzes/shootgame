@@ -931,6 +931,7 @@ class ShootGame(App):
             return False
         if self.points > int(self.bestscore[self.dificulty]):
             self.bestscore[self.dificulty] = self.points
+            self.load_score_img()
             return True
         else:
             return False
@@ -1012,6 +1013,33 @@ class ShootGame(App):
                         self.bestscore[row['dificulty']] = row['score']
             except ValueError:
                 self.bestscore = 0
+        self.load_score_img()
+
+    def load_score_img(self):
+        for difficulty in self.bestscore:
+            print(difficulty)
+            print(self.bestscore[difficulty])
+            score = int(self.bestscore[difficulty])
+            if score >= 100 and score < 200:
+                img = 'BirdGreen-idle-0'
+
+            elif score >= 200 and score < 300:
+                img = 'BirdYellow-idle-0'
+            elif score >= 300 and score < 400:
+                img = 'BirdPurple-idle-0'
+            elif score >= 400 and score < 600:
+                img = 'BirdRed-idle-0'
+            elif score >= 600:
+                img = 'BirdHen-idle-0'
+            else:
+                img = 'BirdGreen-idle-0'
+
+            if difficulty == 'easy':
+                self.scoresscreen.ids.bonus1.source = self.ASSETPATH + img
+            elif difficulty == 'medium':
+                self.scoresscreen.ids.bonus2.source = self.ASSETPATH + img
+            elif difficulty == 'hard':
+                self.scoresscreen.ids.bonus3.source = self.ASSETPATH + img
 
 
 if __name__ == '__main__':
