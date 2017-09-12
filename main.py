@@ -654,9 +654,9 @@ class ShootGame(App):
         self.add_targets(self.dkhard, 1)
         self.add_targets(self.dkbonus, 1)
         self.add_targets(self.dkcrasy, 1)
+        self.add_targets(self.dkegg, 6)
         self.add_targets(self.dkbad, 3)
         self.add_targets(self.dkhen, 1)
-        self.add_targets(self.dkegg, 6)
 
         self.screen_m.current = 'menu'
         Clock.schedule_interval(self.endtime_mode, 1)
