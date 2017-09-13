@@ -815,7 +815,7 @@ class ShootGame(App):
                     'egg' in btn.duck.ducktype and
                     btn.touched and
                     btn.color[3] > 0):
-                btn.color[3] -= 0.25
+                btn.color[3] -= 0.35
 
     def upte_label_pts(self):
         '''fade out the btn's points displayed and smoothly add scores pts'''
