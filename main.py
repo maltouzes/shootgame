@@ -23,34 +23,35 @@ __version__ = '0.0.40'
 ShootGame is a game
 """
 
-import os
-import operator
-import random
 import csv
+import operator
+import os
+import random
 # from customtransition import CustomTransition
 # from kivy.uix.screenmanager import AnimationTransition
 # from datetime import datetime
 # from kivy.utils import platform
-from kivy.uix.label import Label
-from kivy.properties import NumericProperty
-from kivy.properties import DictProperty
-from kivy.properties import StringProperty
+from kivy.animation import Animation
 from kivy.app import App
+from kivy.base import EventLoop
 from kivy.clock import Clock
+from kivy.core.audio import SoundLoader
+from kivy.core.window import Window
+from kivy.lang import Builder
+from kivy.properties import DictProperty
+from kivy.properties import NumericProperty
+from kivy.properties import StringProperty
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.image import Image
+from kivy.uix.label import Label
+from kivy.uix.screenmanager import FadeTransition
 from kivy.uix.screenmanager import Screen
 from kivy.uix.screenmanager import ScreenManager
-from kivy.uix.behaviors import ButtonBehavior
-# from kivy.uix.image import AsyncImage
-from kivy.uix.image import Image
-from kivy.core.window import Window
-# from kivy.uix.gridlayout import GridLayout
-from kivy.uix.floatlayout import FloatLayout
-from kivy.core.audio import SoundLoader
-# from kivy.graphics import Rectangle
-from kivy.uix.screenmanager import FadeTransition
 from kivy.uix.screenmanager import SlideTransition
-from kivy.animation import Animation
-from kivy.lang import Builder
+# from kivy.uix.image import AsyncImage
+# from kivy.uix.gridlayout import GridLayout
+# from kivy.graphics import Rectangle
 try:
     from plyer import vibrator
 except ImportError:
@@ -705,7 +706,6 @@ class ShootGame(App):
 
     def on_start(self):
         '''Loop the keyboard input'''
-        from kivy.base import EventLoop
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
 
     def start_easy(self):
