@@ -1013,23 +1013,23 @@ class ShootGame(App):
         for difficulty in self.bestscore:
             score = int(self.bestscore[difficulty])
 
-            if score >= 100 and score < 200:
+            if score >= 2000 and score < 15000:
                 img = 'BirdGreen-idle-'
                 imgindexmax = 2
                 txt = 'Novice'
-            elif score >= 200 and score < 300:
+            elif score >= 15000 and score < 50000:
                 img = 'BirdYellow-idle-'
                 imgindexmax = 8
                 txt = 'Sophomore'
-            elif score >= 300 and score < 400:
+            elif score >= 100000 and score < 200000:
                 img = 'BirdPurple-idle-'
                 imgindexmax = 2
                 txt = 'Intermediate'
-            elif score >= 400 and score < 600:
+            elif score >= 200000 and score < 400000:
                 img = 'BirdRed-idle-'
                 imgindexmax = 2
                 txt = 'Advanced'
-            elif score >= 600:
+            elif score >= 400000:
                 img = 'BirdHen-idle-'
                 imgindexmax = 4
                 txt = 'Expert'
