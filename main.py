@@ -143,12 +143,11 @@ class TargetButton(ButtonBehavior, Image):
             shootgame.finish()
 
         shootgame.shoot.play()
-        ptsmulti = shootgame.dificultypts
         if self.touched is True and self.killed is not True:
             self.source = (shootgame.ASSETPATH +
                            self.duck.deadimg + str(0))
 
-            ptswin = self.duck.hurtpts * ptsmulti
+            ptswin = self.duck.hurtpts
             self.shoot_type(self.source)
             ptswinmult = ptswin*self.mult_pts_type()
             shootgame.points += ptswinmult
@@ -161,7 +160,7 @@ class TargetButton(ButtonBehavior, Image):
         elif self.touched is False:
             self.source = (shootgame.ASSETPATH +
                            self.duck.hurtimg + str(0))
-            ptswin = self.duck.normalpts * ptsmulti
+            ptswin = self.duck.normalpts
             shootgame.points += ptswin
             self.display_pts_win(ptswin)
             self.score_to_time()
@@ -198,14 +197,13 @@ class TargetButton(ButtonBehavior, Image):
     def score_to_time(self):
         '''transform pts to time'''
         pointup = shootgame.points - shootgame.lstscorebeforeaddtime
-        pointupdif = pointup/shootgame.dificultypts
-        if ((pointupdif >= shootgame.score_to_time)
+        if ((pointup >= shootgame.score_to_time)
                 and 'time' in shootgame.mode):
             pointbyhundred = (round(pointup/100)*100)
-            scoreremain = pointupdif - pointbyhundred
+            scoreremain = pointup - pointbyhundred
             timeadded = \
                 (shootgame.timeadd *
-                 int(round(pointupdif/shootgame.score_to_time)))
+                 int(round(pointup/shootgame.score_to_time)))
             shootgame.timer += timeadded
             shootgame.lstscorebeforeaddtime = shootgame.points - scoreremain
 
@@ -380,7 +378,6 @@ class ShootGame(App):
     bestscore = DictProperty({'easy': 0, 'medium': 0, 'hard': 0})
     newrecord = StringProperty('')
     dificulty = 'none'  # easy, medium and hard
-    dificultypts = 1
     mode = 'none'  # arcade, time
     # shoot = SoundLoader.load(os.getcwd() + '/sound/shotgun.wav')
     soundbtn = SoundLoader.load(os.getcwd() + '/sound/push.ogg')
@@ -618,16 +615,12 @@ class ShootGame(App):
     def diffic_mult(self):
         '''return the dificulty multiplier for move the buttons'''
         if self.dificulty == 'easy':
-            self.dificultypts = 1
             return random.uniform(1.5, 2)
         elif self.dificulty == 'medium':
-            self.dificultypts = 2
             return random.uniform(2.5, 3)
         elif self.dificulty == 'hard':
-            self.dificultypts = 3
             return random.uniform(3.5, 4)
         else:
-            self.dificultypts = 1
             return random.uniform(1, 2)  # easy
 
     def build(self):
@@ -829,7 +822,7 @@ class ShootGame(App):
 
         if self.pointsdisplay < self.points:
             if self.pointsdisplay + 100 < self.points:
-                self.pointsdisplay += random.randint(5, 9) * self.dificultypts
+                self.pointsdisplay += random.randint(5, 9)
             else:
                 self.pointsdisplay += random.randint(1, 5)
         else:  # self.pointsdisplay > self.points:
