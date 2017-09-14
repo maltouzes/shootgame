@@ -117,7 +117,7 @@ class GifButton(ButtonBehavior, Image, Gif):
 
 
 class TargetButton(ButtonBehavior, Image):
-    '''cibles for shoot, is composed of the Duck class'''
+    '''target for shoot, is composed of the Duck class'''
     def __init__(self, duck, *args, **kwargs):
         '''initialize the Duck class parameter as duck (composition),
         then use super() for parent class. see the MRO for details'''
@@ -394,7 +394,7 @@ class ShootGame(App):
     hen_stopped = False
 
     def ducks_init(self):
-        '''Initialize the cibles, with their
+        '''Initialize the target, with their
         :param type: easy, medium, hard or bad
         :type: normalpts: int
         :type: hurtpts: int
@@ -455,7 +455,7 @@ class ShootGame(App):
                           4, 2)
 
     def add_targets(self, duck, num):
-        '''add the cibles take a duck parameter
+        '''add the target take a duck parameter
         and add the coresponding duck multiplying the num parameter (number)'''
 
         for x in range(num):
@@ -513,8 +513,8 @@ class ShootGame(App):
                     pass
 
     def move_buttons(self, dt):
-        '''move every buttons (cibles) in the screen according to the dificulty
-        and the rapidity of the cibles'''
+        '''move every buttons (target) in the screen according to the dificulty
+        and the rapidity of the target'''
         if self.screen_m.current != 'game':
             pass
         else:
