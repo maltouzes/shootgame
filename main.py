@@ -56,7 +56,7 @@ try:
 except ImportError:
     pass
 
-# Window.size = (800, 460)
+Window.size = (800, 460)
 MAX_TIMER = 25
 
 
@@ -403,25 +403,25 @@ class ShootGame(App):
         :param hurtmalimg: img of the duck is hurted
         :param deadimg: img when the duck is dead
         '''
-        self.dkeasy = Duck('Bird', 'easy', 30, 50, 1,
+        self.dkeasy = Duck('Bird', 'easy', 10, 30, 1,
                            'BirdGreen-idle-',
                            'BirdGreen-hit-',
                            'BirdGreen-hit-',
                            2, 2)
 
-        self.dkmedium = Duck('Bird', 'medium', 40, 100, 1.3,
+        self.dkmedium = Duck('Bird', 'medium', 20, 50, 1.3,
                              'BirdYellow-idle-',
                              'BirdYellow-hit-',
                              'BirdYellow-hit-',
                              8, 2)
 
-        self.dkhard = Duck('Bird', 'hard', 10, 300, 2,  # pts, pts and rapidity
+        self.dkhard = Duck('Bird', 'hard', 10, 200, 2,  # pts, pts and rapidity
                            'BirdPurple-idle-',
                            'BirdPurple-hit-',
                            'BirdPurple-hit-',
                            2, 2)
 
-        self.dkbonus = Duck('Bird', 'crasy', 800, 0, 3,
+        self.dkbonus = Duck('Bird', 'crasy', 600, 0, 3,
                             'BirdRed-idle-',
                             'BirdRed-hit-',
                             'BirdRed-hit-',
@@ -614,13 +614,13 @@ class ShootGame(App):
         '''return the dificulty multiplier for move the buttons'''
         if self.dificulty == 'easy':
             self.dificultypts = 1
-            return random.uniform(1, 2)
+            return random.uniform(1.5, 2)
         elif self.dificulty == 'medium':
             self.dificultypts = 2
-            return random.uniform(2, 3)
+            return random.uniform(2.5, 3)
         elif self.dificulty == 'hard':
             self.dificultypts = 3
-            return random.uniform(3, 4)
+            return random.uniform(3.5, 4)
         else:
             self.dificultypts = 1
             return random.uniform(1, 2)  # easy
