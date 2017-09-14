@@ -56,15 +56,16 @@
         font_size: '30sp'
 
     ImgButton:
-        source: app.ASSETPATH + 'yellow_button01'
+        source: app.ASSETPATH + 'star'
         pos_hint: {'center_x': 0.9, 'center_y': 0.1}
+        size_hint: 0.15, 0.15
         on_press: root.manager.current = 'scores'
 
     Label:
         text: "Score"
         pos_hint: {'center_x': 0.9, 'center_y': 0.1}
         bold: True
-        font_size: '30sp'
+        font_size: '25sp'
 
 
 
