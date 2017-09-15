@@ -456,14 +456,14 @@ class ShootGame(App):
                           'coin-',
                           4, 2)
 
-    def add_targets(self, duck, num):
+    def add_targets(self, duck, num, size_hx=None, size_hy=None):
         '''add the target take a duck parameter
         and add the coresponding duck multiplying the num parameter (number)'''
 
         for x in range(num):
             btn = TargetButton(
                     duck,
-                    size_hint=(None, None),
+                    size_hint=(size_hx, size_hy),
                     source=(self.ASSETPATH +
                             duck.normalimg + str(0)))
 
@@ -654,7 +654,7 @@ class ShootGame(App):
         self.add_targets(self.dkhard, 1)
         self.add_targets(self.dkbonus, 1)
         self.add_targets(self.dkcrasy, 1)
-        self.add_targets(self.dkegg, 6)
+        self.add_targets(self.dkegg, 6, 0.1, 0.1)
         self.add_targets(self.dkbad, 3)
         self.add_targets(self.dkhen, 1)
 
