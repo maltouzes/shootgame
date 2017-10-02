@@ -23,6 +23,7 @@ __version__ = '0.0.50'
 ShootGame is a game
 """
 
+from kivy.uix.checkbox import CheckBox
 import csv
 import operator
 import os
@@ -341,6 +342,24 @@ class PauseScreen(Screen):
     pass
 
 
+class OptionsScreen(Screen):
+    def change_volume(b, checkbox):
+        if not checkbox.active:
+            shootgame.sound_game.volume = shootgame.MASTER_MUSIC_VOLUME
+        else:
+            shootgame.sound_game.volume = 0
+
+
+class MyCheckbox(CheckBox):
+    def __init__(self, *args, **kwargs):
+        self.background_checkbox_normal = (
+                shootgame.ASSETPATH + 'yellow_boxCheckmark')
+        self.background_checkbox_down = (
+                shootgame.ASSETPATH + 'yellow_boxCross')
+
+        super().__init__(*args, **kwargs)
+
+
 class ScoresScreen(Screen):
     pass
 
@@ -368,6 +387,7 @@ class StartScreen(Screen):
 class ShootGame(App):
     '''all the logic of the game'''
     ASSETPATH = 'atlas://atlas/birdsatlas/'
+    MASTER_MUSIC_VOLUME = 0.5
 
     background1 = ASSETPATH + ("2")
     background2 = ASSETPATH + ("1")
@@ -627,6 +647,7 @@ class ShootGame(App):
     def build(self):
         '''create a ScreenManager and add all the Screens'''
         self.sound_game.play()
+        self.sound_game.volume = self.MASTER_MUSIC_VOLUME
         filename = (os.getcwd() + '/shootgamebuild.kv')
 
         with open(filename, encoding='utf-8') as f:
@@ -639,10 +660,12 @@ class ShootGame(App):
         self.shootscreen = ShootScreen(name='game')
         self.pausescreen = PauseScreen(name='pause')
         self.creditsscreen = CreditsScreen(name='credits')
+        self.optionsscreen = OptionsScreen(name='options')
         self.scoresscreen = ScoresScreen(name='scores')
         self.screen_m.add_widget(StartScreen(name='menu'))
         self.screen_m.add_widget(LevelScreen(name='level'))
         self.screen_m.add_widget(self.creditsscreen)
+        self.screen_m.add_widget(self.optionsscreen)
         self.screen_m.add_widget(self.scoresscreen)
         self.screen_m.add_widget(self.pausescreen)
         self.screen_m.add_widget(WinScreen(name='win'))
@@ -982,12 +1005,13 @@ class ShootGame(App):
 
     def on_stop(self):
         '''save score when the app stop'''
+        self.sound_game.volume = 0
         self.new_score()  # check this
         self.save_score()
 
     def on_resume(self):
         '''Resume after on_pause on Android'''
-        self.sound_game.volume = 1
+        self.sound_game.volume = self.MASTER_MUSIC_VOLUME
 
     def save_score(self):
         '''save the score to a file'''
