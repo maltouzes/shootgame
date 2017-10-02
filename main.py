@@ -379,8 +379,9 @@ class ShootGame(App):
     newrecord = StringProperty('')
     dificulty = 'none'  # easy, medium and hard
     mode = 'none'  # arcade, time
-    # shoot = SoundLoader.load(os.getcwd() + '/sound/shotgun.wav')
     soundbtn = SoundLoader.load(os.getcwd() + '/sound/push.ogg')
+    sound_game = SoundLoader.load(os.getcwd() + '/sound/happy.ogg')
+    sound_game.loop = True
     shoot = soundbtn
     timer = NumericProperty(0)
     pointsdisplay = NumericProperty(0)
@@ -625,6 +626,7 @@ class ShootGame(App):
 
     def build(self):
         '''create a ScreenManager and add all the Screens'''
+        self.sound_game.play()
         filename = (os.getcwd() + '/shootgamebuild.kv')
 
         with open(filename, encoding='utf-8') as f:
@@ -973,6 +975,7 @@ class ShootGame(App):
 
     def on_pause(self):
         '''Enable pause on Android'''
+        self.sound_game.volume = 0
         self.new_score()  # check this
         self.save_score()
         return True
@@ -984,7 +987,7 @@ class ShootGame(App):
 
     def on_resume(self):
         '''Resume after on_pause on Android'''
-        pass
+        self.sound_game.volume = 1
 
     def save_score(self):
         '''save the score to a file'''
