@@ -345,17 +345,19 @@ class PauseScreen(Screen):
 class OptionsScreen(Screen):
     def change_volume(b, checkbox):
         if not checkbox.active:
-            shootgame.sound_game.volume = shootgame.MASTER_MUSIC_VOLUME
-        else:
             shootgame.sound_game.volume = 0
+            shootgame.music_volume = 0
+        else:
+            shootgame.sound_game.volume = shootgame.MASTER_MUSIC_VOLUME
+            shootgame.music_volume = shootgame.MASTER_MUSIC_VOLUME
 
 
 class MyCheckbox(CheckBox):
     def __init__(self, *args, **kwargs):
         self.background_checkbox_normal = (
-                shootgame.ASSETPATH + 'yellow_boxCheckmark')
-        self.background_checkbox_down = (
                 shootgame.ASSETPATH + 'yellow_boxCross')
+        self.background_checkbox_down = (
+                shootgame.ASSETPATH + 'yellow_boxCheckmark')
 
         super().__init__(*args, **kwargs)
 
@@ -387,7 +389,8 @@ class StartScreen(Screen):
 class ShootGame(App):
     '''all the logic of the game'''
     ASSETPATH = 'atlas://atlas/birdsatlas/'
-    MASTER_MUSIC_VOLUME = 0.5
+    MASTER_MUSIC_VOLUME = 0  # standard music volume default: 0.2
+    music_volume = MASTER_MUSIC_VOLUME  # useful for on_resume()
 
     background1 = ASSETPATH + ("2")
     background2 = ASSETPATH + ("1")
@@ -1011,7 +1014,7 @@ class ShootGame(App):
 
     def on_resume(self):
         '''Resume after on_pause on Android'''
-        self.sound_game.volume = self.MASTER_MUSIC_VOLUME
+        self.sound_game.volume = self.music_volume
 
     def save_score(self):
         '''save the score to a file'''
@@ -1034,6 +1037,13 @@ class ShootGame(App):
                         self.bestscore[row['dificulty']] = row['score']
             except ValueError:
                 self.bestscore = 0
+        self.load_score_img()
+
+    def reset_score(self):
+        if os.path.isfile('scores.csv'):
+            os.remove('scores.csv')
+        for score in self.bestscore:
+            self.bestscore[score] = 0
         self.load_score_img()
 
     def load_score_img(self):

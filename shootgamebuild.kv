@@ -323,5 +323,12 @@
         source: app.ASSETPATH + 'music'
         pos_hint: {'center_x': 0.4, 'center_y': 0.8}
     MyCheckbox:
+        active: True
         pos_hint: {'center_x': 0.7, 'center_y': 0.8}
         on_press: root.change_volume(self)
+    ImgButton:
+        size_hint: 0.15, 0.15
+        source: os.getcwd() + '/assetswork/ok/delete_red.png'
+        # source: app.ASSETPATH + ''
+        pos_hint: {'center_x': 0.4, 'center_y': 0.6}
+        on_press: app.reset_score()
