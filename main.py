@@ -349,13 +349,9 @@ class OptionsScreen(Screen):
             shootgame.sound_game.volume = 0
             shootgame.music_volume = 0
         else:
-            # shootgame.sound_game.volume = shootgame.MASTER_MUSIC_VOLUME
-            # shootgame.music_volume = shootgame.MASTER_MUSIC_VOLUME
             shootgame.music_volume = \
                 shootgame.optionsscreen.ids.slider_volume.value_normalized
             shootgame.sound_game.volume = shootgame.music_volume
-            # shootgame.optionsscreen.ids.checkbox_volume = \
-            #     shootgame.music_volume * 100
 
     def checkbox(self, value):
         check = shootgame.optionsscreen.ids.checkbox_volume
@@ -662,8 +658,8 @@ class ShootGame(App):
 
     def build(self):
         '''create a ScreenManager and add all the Screens'''
+        self.load_volume_file()
         self.sound_game.play()
-        self.sound_game.volume = self.MASTER_MUSIC_VOLUME
         filename = (os.getcwd() + '/shootgamebuild.kv')
 
         with open(filename, encoding='utf-8') as f:
@@ -1008,6 +1004,10 @@ class ShootGame(App):
                 self.screen_m.current = 'pause'
             elif self.screen_m.current == 'menu':
                 self.leave()
+            elif self.screen_m.current == 'options':
+                self.save_volume_file()
+                self.screen_m.transition = FadeTransition()
+                self.screen_m.current = 'menu'
             else:
                 self.screen_m.transition = FadeTransition()
                 self.screen_m.current = 'menu'
@@ -1033,6 +1033,18 @@ class ShootGame(App):
     def on_resume(self):
         '''Resume after on_pause on Android'''
         self.sound_game.volume = self.music_volume
+
+    def save_volume_file(self):
+        with open('volume.txt', 'w') as f:
+            f.write(str(self.sound_game.volume))
+
+    def load_volume_file(self):
+        if os.path.isfile('volume.txt'):
+            with open('volume.txt', 'r') as f:
+                self.sound_game.volume = float(f.read())
+                self.music_volume = self.sound_game.volume
+        else:
+            self.sound_game.volume = self.MASTER_MUSIC_VOLUME
 
     def save_score(self):
         '''save the score to a file'''
