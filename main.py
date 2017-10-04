@@ -24,6 +24,7 @@ ShootGame is a game
 """
 
 from kivy.uix.checkbox import CheckBox
+from kivy.uix.popup import Popup
 import csv
 import operator
 import os
@@ -983,6 +984,11 @@ class ShootGame(App):
     def hook_keyboard(self, window, key, *largs):
         '''hook the back key'''
         if key == 27 or key == 97 or key == 1001:
+            if isinstance(App.get_running_app().root_window.children[0],
+                          Popup):
+                    App.get_running_app().root_window.children[0].dismiss()
+                    return True
+
             if self.screen_m.current == 'game':
                 self.new_score()
                 self.newimgpause()
