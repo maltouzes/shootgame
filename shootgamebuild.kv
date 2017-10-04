@@ -322,16 +322,28 @@
     ImgButton:
         size_hint: 0.15, 0.15
         source: app.ASSETPATH + 'music'
-        pos_hint: {'center_x': 0.4, 'center_y': 0.8}
+        pos_hint: {'center_x': 0.3, 'center_y': 0.8}
     MyCheckbox:
+        id: checkbox_volume
         active: True
-        pos_hint: {'center_x': 0.7, 'center_y': 0.8}
+        pos_hint: {'center_x': 0.6, 'center_y': 0.8}
         on_press: root.change_volume(self)
+    Slider:
+        id: slider_volume
+        size_hint: 0.5, 0.15
+        # value: app.sound_game.volume * 100
+        value: app.music_volume * 100
+        pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        # pos_hint_y: 0.6
+        cursor_image: app.ASSETPATH + 'bubble_green'
+        background_width: 60
+        on_value: app.sound_game.volume = self.value_normalized
+        on_value: root.checkbox(self.value)
     ImgButton:
         size_hint: 0.15, 0.15
         source: os.getcwd() + '/assetswork/ok/delete_red.png'
         # source: app.ASSETPATH + ''
-        pos_hint: {'center_x': 0.4, 'center_y': 0.6}
+        pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         on_release: Factory.MyPopup().open()
 
 <MyPopup@Popup>:
@@ -341,10 +353,11 @@
     background: app.background1
     FloatLayout:
         Label:
-            pos_hint: {'center_x': 0.5, 'center_y': 0.8}
-            markup: True
+            pos_hint: {'center_x': 0.5, 'center_y': 0.9}
+            font_name: os.getcwd() + '/fonts/Bubblegum.ttf'
+            # markup: True
             color: 0, 0, 0, 1
-            text: "Delete all scores?"
+            text: "Delete scores?"
             font_size: '50sp'
         ImgButton:
             source: os.getcwd() + '/assetswork/ok/trash_yellow.png'

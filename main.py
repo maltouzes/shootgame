@@ -344,13 +344,25 @@ class PauseScreen(Screen):
 
 
 class OptionsScreen(Screen):
-    def change_volume(b, checkbox):
+    def change_volume(self, checkbox):
         if not checkbox.active:
             shootgame.sound_game.volume = 0
             shootgame.music_volume = 0
         else:
-            shootgame.sound_game.volume = shootgame.MASTER_MUSIC_VOLUME
-            shootgame.music_volume = shootgame.MASTER_MUSIC_VOLUME
+            # shootgame.sound_game.volume = shootgame.MASTER_MUSIC_VOLUME
+            # shootgame.music_volume = shootgame.MASTER_MUSIC_VOLUME
+            shootgame.music_volume = \
+                shootgame.optionsscreen.ids.slider_volume.value_normalized
+            shootgame.sound_game.volume = shootgame.music_volume
+            # shootgame.optionsscreen.ids.checkbox_volume = \
+            #     shootgame.music_volume * 100
+
+    def checkbox(self, value):
+        check = shootgame.optionsscreen.ids.checkbox_volume
+        if value == 0:
+            check.active = False
+        else:
+            check.active = True
 
 
 class MyCheckbox(CheckBox):
