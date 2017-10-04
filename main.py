@@ -335,7 +335,7 @@ class CreditsScreen(Screen):
             self.txt = (
                 "\nCREDITS\n\n"
                 "Please visit:\n\n"
-                "https://github.com/maltouzes/shootgame/blob/master/CREDITS")
+                "http://valstudiogame.maltouzes.win/shootgame.php")
 
 
 class PauseScreen(Screen):
