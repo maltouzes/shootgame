@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.0.60'
+__version__ = '0.0.61'
 ###############################################################################
 # copyright 2016-2017 Tony Maillefaud <maltouzes@gmail.com>                   #
 #                                                                             #
@@ -411,8 +411,13 @@ class ShootGame(App):
     newrecord = StringProperty('')
     dificulty = 'none'  # easy, medium and hard
     mode = 'none'  # arcade, time
-    soundbtn = SoundLoader.load(os.getcwd() + '/sound/push.ogg')
-    sound_game = SoundLoader.load(os.getcwd() + '/sound/happy.ogg')
+    soundbtn = SoundLoader.load(os.getcwd() +
+                                '/sound/push.ogg')
+    sound_game_menu = SoundLoader.load(os.getcwd() +
+                                       '/sound/happy.ogg')
+    sound_game_1 = SoundLoader.load(os.getcwd() +
+                                    '/sound/copycat(revised)_syncopika.ogg')
+    sound_game = sound_game_menu
     sound_game.loop = True
     shoot = soundbtn
     timer = NumericProperty(0)
@@ -974,9 +979,16 @@ class ShootGame(App):
             self.newrecord = ''
         self.screen_m.current = 'win'
 
+    def new_music(self, music):
+        self.sound_game.stop()
+        self.sound_game = music
+        self.sound_game.volume = self.music_volume
+        self.sound_game.play()
+
     def start(self):
         '''add the button to the screen and reset their position. reset the
         points'''
+        self.new_music(self.sound_game_1)
         self.end_anim = False
         shootgame.shootscreen.ids.combolabel.text = ''
         self.lastshoot_type = None
@@ -998,6 +1010,7 @@ class ShootGame(App):
                     return True
 
             if self.screen_m.current == 'game':
+                self.new_music(self.sound_game_menu)
                 self.new_score()
                 self.newimgpause()
                 self.screen_m.transition = FadeTransition()
