@@ -47,10 +47,10 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
-from kivy.uix.screenmanager import FadeTransition
+# from kivy.uix.screenmanager import FadeTransition
 from kivy.uix.screenmanager import Screen
 from kivy.uix.screenmanager import ScreenManager
-from kivy.uix.screenmanager import SlideTransition
+# from kivy.uix.screenmanager import SlideTransition
 # from kivy.uix.image import AsyncImage
 # from kivy.uix.gridlayout import GridLayout
 # from kivy.graphics import Rectangle
@@ -330,7 +330,9 @@ class CreditsScreen(Screen):
             with open('CREDITS', 'r') as f:
                 self.txt = "\n" + f.read()
                 import re
-                self.txt = re.sub(r'\*|http.*', '', self.txt)
+                self.txt = re.sub(r'https?://[\w]*\.[\w]*\.?[\w]*\/?[\w]*',
+                                  '',
+                                  self.txt)
         except FileNotFoundError:
             self.txt = (
                 "\nCREDITS\n\n"
@@ -672,7 +674,7 @@ class ShootGame(App):
 
         self.soundbtn.volume = 0.5
         self.screen_m = ScreenManager()
-        self.screen_m.transition.direction = 'left'
+        self.screen_m.transition.direction = 'up'
 
         self.shootscreen = ShootScreen(name='game')
         self.pausescreen = PauseScreen(name='pause')
@@ -696,7 +698,7 @@ class ShootGame(App):
         self.add_targets(self.dkhard, 1)
         self.add_targets(self.dkbonus, 1)
         self.add_targets(self.dkcrasy, 1)
-        self.add_targets(self.dkegg, 6, 0.1, 0.1)
+        self.add_targets(self.dkegg, 6, 0.16, 0.16)
         self.add_targets(self.dkbad, 3)
         self.add_targets(self.dkhen, 1)
 
@@ -774,13 +776,13 @@ class ShootGame(App):
         # self.screen_m.transition = CustomTransition()
         # self.screen_m.transition.al = AnimationTransition.out_quad
         # self.screen_m.transition.duration = .4
-        self.screen_m.transition.direction = 'left'
+        # self.screen_m.transition.direction = 'left'
         self.mode = 'arcade'
 
     def time_mode(self):
         '''initialize the timer'''
-        self.screen_m.transition = SlideTransition()
-        self.screen_m.transition.direction = 'left'
+        # self.screen_m.transition = SlideTransition()
+        # self.screen_m.transition.direction = 'left'
         self.shootscreen.ids.timerlabel.text = 'Time ' + str(self.timer)
         self.timer = 15  # default is 15
         self.shootscreen.ids.timerlabel.color = (0, 0, 0, 1)
@@ -997,9 +999,9 @@ class ShootGame(App):
         self.lstscorebeforeaddtime = 0
         self.points = self.pointsdisplay = 0
         self.scorelabel.text = ''
+        # self.screen_m.transition = SlideTransition()
+        # self.screen_m.transition.direction = 'up'
         self.reset_buttons()
-        self.screen_m.transition = SlideTransition()
-        self.screen_m.transition.direction = 'up'
 
     def hook_keyboard(self, window, key, *largs):
         '''hook the back key'''
@@ -1013,16 +1015,16 @@ class ShootGame(App):
                 self.new_music(self.sound_game_menu)
                 self.new_score()
                 self.newimgpause()
-                self.screen_m.transition = FadeTransition()
+                # self.screen_m.transition = FadeTransition()
                 self.screen_m.current = 'pause'
             elif self.screen_m.current == 'menu':
                 self.leave()
             elif self.screen_m.current == 'options':
                 self.save_volume_file()
-                self.screen_m.transition = FadeTransition()
+                # self.screen_m.transition = FadeTransition()
                 self.screen_m.current = 'menu'
             else:
-                self.screen_m.transition = FadeTransition()
+                # self.screen_m.transition = FadeTransition()
                 self.screen_m.current = 'menu'
             return True
 
